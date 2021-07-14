@@ -18,6 +18,8 @@
     "mongoose": "^5.4.6"
   },
   "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslint-plugin-react": "^7.24.0",
     "nodemon": "^1.18.10"
   }
 }
