@@ -14,8 +14,11 @@ const Header = ({ classes }) => {
   const {currentUser } = state;
 
   return <div className={classes.root}>
-    <AppBar position="static">
-      <Toolbar>
+    <AppBar position="static"> 
+
+
+    
+      <Toolbar> 
         { /* Title Logo*/}
         <div className={classes.grow}>
           <MapIcon className={classes.icon}></MapIcon>
