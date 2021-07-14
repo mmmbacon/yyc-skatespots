@@ -6,6 +6,7 @@ import MapIcon from "@material-ui/icons/Map";
 import Typography from "@material-ui/core/Typography";
 
 import Context from '../context';
+import Signout from '../components/Auth/Signout';
 
 const Header = ({ classes }) => {
 
@@ -39,7 +40,7 @@ const Header = ({ classes }) => {
               noWrap>
               {currentUser.name}
               </Typography>
-            {/*Signout button*/}
+            <Signout></Signout>
           </div>
         )}
       </Toolbar>
