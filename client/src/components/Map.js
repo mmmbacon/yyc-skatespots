@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
 import ReactMapGL, { NavigationControl, Marker, Popup } from 'react-map-gl';
 import { withStyles } from "@material-ui/core/styles";
 import PinIcon from './PinIcon';
@@ -6,10 +7,12 @@ import differenceInMinutes from 'date-fns/difference_in_minutes';
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import DeleteIcon from "@material-ui/icons/DeleteTwoTone";
+import { Subscription } from "react-apollo";
 
 import { useClient } from '../client';
 import { GET_PINS_QUERY } from '../graphql/queries';
 import { DELETE_PIN_MUTATION } from "../graphql/mutations";
+import { PIN_UPDATED_SUBSCRIPTION, PIN_DELETED_SUBSCRIPTION, PIN_ADDED_SUBSCRIPTION} from '../graphql/subscriptions';
 import Blog from './Blog';
 import Context from '../context';
 
@@ -19,6 +22,8 @@ const INITIAL_VIEWPORT = {
   zoom: 13
 }
 const Map = ({ classes }) => {
+
+  const mobileSize = useMediaQuery('(max-width: 650px)');
 
   const client = useClient();
   const { state, dispatch} = useContext(Context);
@@ -71,15 +76,15 @@ const Map = ({ classes }) => {
 
   const handleDeletePin = async pin => {
     const variables = { pinId: pin._id }
-    const { deletePin } = await client.request(DELETE_PIN_MUTATION, variables);
-    dispatch({ type: "DELETE_PIN", payload: deletePin });
+    await client.request(DELETE_PIN_MUTATION, variables);
     setPopup(null);
   }
 
   const isAuthUser = () => state.currentUser._id === popup.author._id
 
-  return <div className={classes.root}>
+  return <div className={mobileSize ? classes.rootMobile : classes.root }>
     <ReactMapGL
+    scrollZoom={!mobileSize}
     width="100vw"
     height="calc(100vh - 64px)"
     mapStyle="mapbox://styles/mapbox/streets-v9"
@@ -171,6 +176,33 @@ const Map = ({ classes }) => {
       )}
 
     </ReactMapGL>
+
+    {/* Subscriptions for Creating / Updating and Deleting Pins */}
+    <Subscription
+      subscription={PIN_ADDED_SUBSCRIPTION}
+      onSubscriptionData={({subscriptionData}) => {
+        const { pinAdded } = subscriptionData.data;
+        console.log("pIN aDDDED", {pinAdded});
+        dispatch({ type: "CREATE_PIN", payload: pinAdded })
+      }}
+    ></Subscription>
+    <Subscription
+      subscription={PIN_UPDATED_SUBSCRIPTION}
+      onSubscriptionData={({subscriptionData}) => {
+        const { pinUpdated } = subscriptionData.data;
+        console.log({pinUpdated});
+        dispatch({ type: "CREATE_COMMENT", payload: pinUpdated })
+      }}
+    ></Subscription>
+    <Subscription
+      subscription={PIN_DELETED_SUBSCRIPTION}
+      onSubscriptionData={({subscriptionData}) => {
+        const { pinDeleted } = subscriptionData.data;
+        console.log({pinDeleted})
+        dispatch({ type: "DELETE_PIN", payload: pinDeleted })
+      }}
+    ></Subscription>
+
     {/* Blog Area To Add Pin Content */}
     <Blog></Blog>
   </div>;
