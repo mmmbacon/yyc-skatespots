@@ -27,11 +27,13 @@ const Map = ({ classes }) => {
 
   const client = useClient();
   const { state, dispatch} = useContext(Context);
+
   useEffect(() => {
     getPins();
   }, []);
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT);
   const [userPosition, setUserPosition] = useState(null);
+
   useEffect(()=>{
     getUserPosition();
   }, []);
@@ -41,6 +43,15 @@ const Map = ({ classes }) => {
     const { getPins } = await client.request(GET_PINS_QUERY);
     dispatch({ type: "GET_PINS", payload: getPins });
   }
+
+  useEffect(()=>{
+    const pinExists = popup && state.pins.findIndex(pin => pin._id === popup._id) > -1;
+    
+    if(!pinExists){
+      setPopup(null);
+    }
+
+  }, [state.pins.length]);
 
   const getUserPosition = () =>{
     if("geolocation" in navigator){
