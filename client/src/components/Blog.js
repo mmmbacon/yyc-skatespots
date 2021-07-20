@@ -39,7 +39,7 @@ const styles = {
     maxHeight: "calc(100vh - 64px)",
     overflowY: "scroll",
     display: "flex",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   rootMobile: {
     maxWidth: "100%",
