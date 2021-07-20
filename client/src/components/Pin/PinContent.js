@@ -31,7 +31,10 @@ const PinContent = ({ classes }) => {
         color="inherit" 
         gutterBottom
       >
-        <FaceIcon className={classes.icon} />
+        <img className={classes.picture}
+          src={author.picture}
+          alt="Pic"
+        />
         {author.name}
       </Typography>
       <Typography
@@ -64,8 +67,13 @@ const styles = theme => ({
     width: "100%"
   },
   icon: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1)
+  },
+  picture: {
+    height: "35px",
+    borderRadius: "90%",
+    marginRight: theme.spacing(1)
   },
   text: {
     display: "flex",

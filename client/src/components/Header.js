@@ -22,17 +22,22 @@ const Header = ({ classes }) => {
 
   return <div className={classes.root}>
     <AppBar position="static"> 
-      <Toolbar bgColor="primary"> 
+      <Toolbar> 
         { /* Title Logo*/}
         <Box display="flex" flexDirection="row" justifyContent="space-between" width="100%" alignItems="center">
-          <Typography
-          className={mobileSize ? classes.mobile : ""}
-          component="h1"
-          variant="h5"
-          color="inherit"
-          noWrap>
-            YYCSkateSpots
-          </Typography>
+          <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-start">
+            <img className={classes.logo} src="../../icons8-roller-skates-50.png" alt="Skate"/>
+            <img className={classes.logo} src="../../icons8-skateboard-50.png" alt="Skate"/>
+            <img className={classes.logo} src="../../icons8-rollerblade-50.png" alt="Skate"/>
+            <Typography
+            className={mobileSize ? classes.mobile : ""}
+            component="h1"
+            variant="h5"
+            color="inherit"
+            noWrap>
+              YYCSkateSpots
+            </Typography>
+          </Box>
         {currentUser && (
           <Box display="flex" flexDirection="row" alignItems="center">
             <Box mr={1}>
@@ -49,7 +54,7 @@ const Header = ({ classes }) => {
             </Box>
             <img className={classes.picture}
               src={currentUser.picture}
-              alt={currentUser.name}
+              alt="Pic"
             />
           </Box>
         )}
@@ -69,17 +74,20 @@ const styles = theme => ({
     alignItems: "center"
   },
   icon: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
     color: "green",
     fontSize: 45
+  },
+  logo: {
+    height: '2.5em',
   },
   mobile: {
     display: "none"
   },
   picture: {
-    height: "50px",
+    height: "35px",
     borderRadius: "90%",
-    marginRight: theme.spacing.unit * 2
+    marginRight: theme.spacing(2)
   }
 });
 
