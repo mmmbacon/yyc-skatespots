@@ -17,32 +17,30 @@ const Signout = ({ classes }) => {
   }
 
   return <GoogleLogout
-  onLogoutSuccess={onSignout}
-  render={({onClick}) => ( 
-    <span className={classes.root} onClick={onClick}>
-      <Typography
-      variant="body1"
-      className={classes.buttonText}
-      style={{ display :  mobileSize ? "none" : "block"}}>
-        Signout
-      </Typography>
-      <ExitToAppIcon className={classes.buttonIcon}></ExitToAppIcon>
-    </span>
+    onLogoutSuccess={onSignout}
+    render={({onClick}) => ( 
+      <span className={classes.root} onClick={onClick}>
+        <Typography
+        variant="body1"
+        className={classes.buttonText}
+        color="textPrimary"
+        style={{ display :  mobileSize ? "none" : "block"}}>
+          Signout
+        </Typography>
+        <ExitToAppIcon className={classes.buttonIcon}></ExitToAppIcon>
+      </span>
   )}></GoogleLogout>
 };
 
-const styles = {
+const styles = theme => ({
   root: {
     cursor: "pointer",
     display: "flex"
   },
-  buttonText: {
-    color: "orange"
-  },
   buttonIcon: {
     marginLeft: "5px",
-    color: "orange"
+    color: theme.palette.text.primary
   }
-};
+});
 
 export default withStyles(styles)(Signout);

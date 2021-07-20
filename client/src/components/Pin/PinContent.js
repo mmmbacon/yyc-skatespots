@@ -3,8 +3,8 @@ import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
-import FaceIcon from "@material-ui/icons/Face";
 import format from 'date-fns/format';
+import { Subscription } from "react-apollo";
 
 import CreateComment from '../Comment/CreateComment';
 import Comments from '../Comment/Comments';
@@ -60,6 +60,7 @@ const PinContent = ({ classes }) => {
       {/* Pin Comments */}
       <CreateComment></CreateComment>
       <Comments comments={comments}></Comments>
+    
     </Box>
   )
 };
