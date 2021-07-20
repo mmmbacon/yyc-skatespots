@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from 'axios';
 import { withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -63,32 +63,36 @@ const CreatePin = ({ classes }) => {
  
   return (
     <form className={classes.form}>
+      <Box ml={1.5}>
+        { image ? (
+          <img src={image && URL.createObjectURL(image)} alt="preview" width="100%"/>
+        ) : (
+          <Box p={1}>
+            <img src="../../icons8-skateboard-100.png" alt="preview" width="100%"/>
+          </Box>
+        )}
+      </Box>
       <Typography 
         className={classes.alignCenter}
         component="h2"
-        variant="h4"
-        color="secondary"
+        variant="h6"
+        color="primary"
+        align="center"
         >
-          <LandscapeIcon className={classes.iconLarge}></LandscapeIcon>
-        Skate Spot
+        Post a new skate spot
       </Typography>
       <Box p={1}>
-        <FormControl>
-          <InputLabel htmlFor="my-input">Email address</InputLabel>
-          <Input id="my-input" aria-describedby="my-helper-text" />
-          <FormHelperText id="my-helper-text">We'll never share your email.</FormHelperText>
-        </FormControl>
         <TextField
           name="title"
           label="title"
-          placeholder="Insert pin title"
+          placeholder="Skate Spot Title"
           onChange={ e => setTitle(e.target.value)}>    
         </TextField>
         <input
           accept="image"
           id="image"
           type="file"
-          className="classes.input"
+          className={classes.input}
           onChange={ e => setImage(e.target.files[0])}>  
         </input>
         <label htmlFor="image">
@@ -105,7 +109,7 @@ const CreatePin = ({ classes }) => {
       <div className={classes.contentField}>
         <TextField
           name="content"
-          label="Content"
+          label="Spot Description and Notes"
           multiline
           rows={mobileSize ? "3" : "6"}
           margin="normal"

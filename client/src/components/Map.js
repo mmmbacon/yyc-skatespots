@@ -69,9 +69,8 @@ const Map = ({ classes }) => {
     })
   }
 
-  const hightlightNewPin = pin => {
-    const isNewPin = differenceInMinutes(Date.now(), Number(pin.createdAt)) <= 30
-    return isNewPin ? "limegreen" : "darkblue";
+  const isNewPin = pin =>{
+    return differenceInMinutes(Date.now(), Number(pin.createdAt)) <= 30;
   }
 
   const handleSelectPin = pin => {
@@ -147,8 +146,8 @@ const Map = ({ classes }) => {
         <PinIcon
           size={40}
           title={pin.title}
-          color={ hightlightNewPin(pin)}
           onClick={()=> handleSelectPin(pin)}
+          isNewPin={ isNewPin(pin) }
         ></PinIcon>
       </Marker>
       ))}

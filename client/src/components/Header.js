@@ -35,7 +35,7 @@ const Header = ({ classes }) => {
             variant="h5"
             color="inherit"
             noWrap>
-              YYCSkateSpots
+              YYC{ mobileSize ? "" : "SkateSpots"}
             </Typography>
           </Box>
         {currentUser && (
@@ -45,7 +45,7 @@ const Header = ({ classes }) => {
             </Box>
             <Box mr={1}>
               <Typography
-                className={mobileSize ? classes.mobile : ""}
+                className={mobileSize ? classes.mobileName : ""}
                 variant="h6"
                 color="inherit"
                 noWrap>
@@ -82,7 +82,10 @@ const styles = theme => ({
     height: '2.5em',
   },
   mobile: {
-    display: "none"
+    fontSize: '2.5em',
+  },
+  mobileName: {
+    display: 'none'
   },
   picture: {
     height: "35px",

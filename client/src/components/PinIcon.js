@@ -20,13 +20,13 @@ function BootstrapTooltip(props) {
   return <Tooltip arrow classes={classes} {...props} />;
 }
 
-export default ({size, title,  color, onClick }) => {
+export default ({size, title, color, isNewPin, onClick }) => {
   return (    
     
     <BootstrapTooltip title={title} aria-label="Pin" placement="right" TransitionComponent={Zoom}>
       <PlaceTwoTone 
         onClick={onClick} 
-        style={{ fontSize: size, color }}>
+        style={{ fontSize: size, color : isNewPin ? "limegreen" : color || "darkblue" }}>
         PinIcon
       </PlaceTwoTone>
     </BootstrapTooltip>
