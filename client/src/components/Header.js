@@ -1,10 +1,14 @@
 import React, { useContext } from "react";
 import { withStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import MapIcon from "@material-ui/icons/Map";
-import Typography from "@material-ui/core/Typography";
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import { 
+  AppBar,
+  Toolbar, 
+  Typography
+} from "@material-ui/core";
+
+import { Box } from "@material-ui/core";
+
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import Context from '../context';
 import Signout from '../components/Auth/Signout';
@@ -18,36 +22,38 @@ const Header = ({ classes }) => {
 
   return <div className={classes.root}>
     <AppBar position="static"> 
-      <Toolbar> 
+      <Toolbar bgColor="primary"> 
         { /* Title Logo*/}
-        <div className={classes.grow}>
-          <MapIcon className={classes.icon}></MapIcon>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" width="100%" alignItems="center">
           <Typography
           className={mobileSize ? classes.mobile : ""}
           component="h1"
-          variant="h6"
+          variant="h5"
           color="inherit"
           noWrap>
-            GeoPins
+            YYCSkateSpots
           </Typography>
-        </div>
-        {}
         {currentUser && (
-          <div className={classes.grow}>
+          <Box display="flex" flexDirection="row" alignItems="center">
+            <Box mr={1}>
+              <Signout></Signout>
+            </Box>
+            <Box mr={1}>
+              <Typography
+                className={mobileSize ? classes.mobile : ""}
+                variant="h6"
+                color="inherit"
+                noWrap>
+                {currentUser.name}
+              </Typography>
+            </Box>
             <img className={classes.picture}
               src={currentUser.picture}
               alt={currentUser.name}
             />
-            <Typography
-              className={mobileSize ? classes.mobile : ""}
-              variant="h5"
-              color="inherit"
-              noWrap>
-              {currentUser.name}
-              </Typography>
-            <Signout></Signout>
-          </div>
+          </Box>
         )}
+        </Box>
       </Toolbar>
     </AppBar>
   </div>;

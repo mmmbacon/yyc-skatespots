@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ReactMapGL, { NavigationControl, Marker, Popup } from 'react-map-gl';
 import { withStyles } from "@material-ui/core/styles";
 import PinIcon from './PinIcon';

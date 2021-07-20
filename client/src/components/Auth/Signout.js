@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import Typography from "@material-ui/core/Typography";
 import Context from '../../context';
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 
 const Signout = ({ classes }) => {

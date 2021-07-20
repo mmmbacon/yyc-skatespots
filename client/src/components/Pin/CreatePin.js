@@ -4,6 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
+import { Box, FormControl, FormHelperText, FormLabel, Input, InputLabel } from "@material-ui/core";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhotoTwoTone";
 import LandscapeIcon from "@material-ui/icons/LandscapeOutlined";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -12,7 +13,7 @@ import SaveIcon from "@material-ui/icons/SaveTwoTone";
 import Context from '../../context';
 import { CREATE_PIN_MUTATION } from "../../graphql/mutations";
 import { useClient } from '../../client';
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 
 const CreatePin = ({ classes }) => {
@@ -69,9 +70,14 @@ const CreatePin = ({ classes }) => {
         color="secondary"
         >
           <LandscapeIcon className={classes.iconLarge}></LandscapeIcon>
-        Pin Location
+        Skate Spot
       </Typography>
-      <div>
+      <Box p={1}>
+        <FormControl>
+          <InputLabel htmlFor="my-input">Email address</InputLabel>
+          <Input id="my-input" aria-describedby="my-helper-text" />
+          <FormHelperText id="my-helper-text">We'll never share your email.</FormHelperText>
+        </FormControl>
         <TextField
           name="title"
           label="title"
@@ -95,7 +101,7 @@ const CreatePin = ({ classes }) => {
             <AddAPhotoIcon></AddAPhotoIcon>
           </Button>
         </label>
-      </div>
+      </Box>
       <div className={classes.contentField}>
         <TextField
           name="content"
