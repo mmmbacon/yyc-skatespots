@@ -29,8 +29,9 @@ const Header = ({ classes }) => {
             <img className={classes.logo} src="../../icons8-roller-skates-50.png" alt="Skate"/>
             <img className={classes.logo} src="../../icons8-skateboard-50.png" alt="Skate"/>
             <img className={classes.logo} src="../../icons8-rollerblade-50.png" alt="Skate"/>
+            <img className={classes.logo} src="../../icons8-heart-50.png" alt="Skate"/>
             <Typography
-            className={mobileSize ? classes.mobile : ""}
+            className={mobileSize ? classes.mobileTitle : classes.title }
             component="h1"
             variant="h5"
             color="inherit"
@@ -81,8 +82,13 @@ const styles = theme => ({
   logo: {
     height: '2.5em',
   },
-  mobile: {
+  mobileTitle: {
     fontSize: '2.5em',
+    marginLeft: '5px'
+  },
+  title: {
+    fontSize: '2.5em',
+    marginLeft: '10px'
   },
   mobileName: {
     display: 'none'

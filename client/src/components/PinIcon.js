@@ -23,7 +23,7 @@ function BootstrapTooltip(props) {
 export default ({size, title, color, isNewPin, onClick }) => {
   return (    
     
-    <BootstrapTooltip title={title} aria-label="Pin" placement="right" TransitionComponent={Zoom}>
+    <BootstrapTooltip title={ color ? color === "hotpink" ? "New Spot" : "My Location" : title  } aria-label="Pin" placement="right" TransitionComponent={Zoom}>
       <PlaceTwoTone 
         onClick={onClick} 
         style={{ fontSize: size, color : isNewPin ? "limegreen" : color || "darkblue" }}>
