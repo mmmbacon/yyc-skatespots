@@ -1,6 +1,5 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import ExploreIcon from "@material-ui/icons/Explore";
 import RoomIcon from '@material-ui/icons/Room';
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from '@material-ui/core/useMediaQuery';

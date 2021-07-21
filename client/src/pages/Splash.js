@@ -1,8 +1,7 @@
 import React, {useContext }  from "react";
 import withRoot from "../withRoot";
 import { Redirect } from 'react-router-dom'
-import Login from "../components/Auth/Login"
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import Login from "../components/Auth/Login";
 
 import Context from '../context';
 

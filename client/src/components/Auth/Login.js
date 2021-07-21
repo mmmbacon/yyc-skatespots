@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { GraphQLClient } from 'graphql-request';
 import { GoogleLogin } from 'react-google-login';
-import { withStyles, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import { Typography, Box, Link } from "@material-ui/core";
 import GitHubIcon from '@material-ui/icons/GitHub';
 
@@ -83,7 +83,7 @@ const Login = () => {
   }
   return <div className={classes.root}>
     <Box display="flex" flexDirection="row" className={classes.social} alignItems="center">
-      <Link href="">
+      <Link href="https://github.com/mmmbacon" target="blank">
         <Box display="flex" alignItems="center">
           <GitHubIcon color="primary"></GitHubIcon>
           <Box pl={1}>

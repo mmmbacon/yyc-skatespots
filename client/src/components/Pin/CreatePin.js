@@ -1,12 +1,11 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import axios from 'axios';
 import { withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import { Box, FormControl, FormHelperText, FormLabel, Input, InputLabel } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhotoTwoTone";
-import LandscapeIcon from "@material-ui/icons/LandscapeOutlined";
 import ClearIcon from "@material-ui/icons/Clear";
 import SaveIcon from "@material-ui/icons/SaveTwoTone";
 

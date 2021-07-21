@@ -1,6 +1,6 @@
 import React from "react";
 import { ThemeProvider, createTheme } from "@material-ui/core/styles";
-import { deepOrange, blue, purple, green, pink} from "@material-ui/core/colors";
+import { blue, purple, green, pink} from "@material-ui/core/colors";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
 // A theme with custom primary and secondary color.
