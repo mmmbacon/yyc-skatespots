@@ -28,9 +28,13 @@ const useStyles = vars => makeStyles( theme => ({
   },
   title: {
     fontSize: '5em',
+    marginBottom: '0px',
+    lineHeight: '1.2em'
   },
   mobileTitle: {
     fontSize: '3em',
+    marginBottom: '0px',
+    lineHeight: '1.2em'
   },
   icon: {
     animation: `$oscillate 500ms ease-in-out ${vars.delay}s infinite`,
@@ -113,7 +117,16 @@ const Login = () => {
     gutterBottom
     noWrap
     color="primary">
-      YYCSkateSpots
+      skatespot.app
+    </Typography>
+    <Typography
+    className={mobileSize ? classes.mobileSubTitle : classes.subTitle}
+    component="h1"
+    variant="h5"
+    gutterBottom
+    noWrap
+    color="primary">
+      find your bearings
     </Typography>
     <GoogleLogin 
       buttonText="Login with Google"
