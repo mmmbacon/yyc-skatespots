@@ -94,16 +94,16 @@ const Login = () => {
     </Box>
     <Box display="flex" flexDirection="row">
       <Box p={1} >
-        <img className={ mobileSize ? logo1classes.mobileIcon : logo1classes.icon} src="../../icons8-roller-skates-100.png" alt="preview"/>
+        <img className={ mobileSize ? logo1classes.mobileIcon : logo1classes.icon} src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-roller-skates-100_p7oamy.png" alt="preview"/>
       </Box>
       <Box p={1} >
-        <img className={ mobileSize ? logo2classes.mobileIcon : logo2classes.icon} src="../../icons8-skateboard-100.png" alt="preview"/>
+        <img className={ mobileSize ? logo2classes.mobileIcon : logo2classes.icon} src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-skateboard-100_ts7wrr.png" alt="preview"/>
       </Box>
       <Box p={1} >
-        <img className={ mobileSize ? logo3classes.mobileIcon : logo3classes.icon} src="../../icons8-rollerblade-100.png" alt="preview"/>
+        <img className={ mobileSize ? logo3classes.mobileIcon : logo3classes.icon} src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-rollerblade-100_xtiixl.png" alt="preview"/>
       </Box>
       <Box p={1} >
-        <img className={ mobileSize ? logo4classes.mobileIcon : logo4classes.icon} src="../../icons8-heart-96.png" alt="preview"/>
+        <img className={ mobileSize ? logo4classes.mobileIcon : logo4classes.icon} src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-heart-96_ihytgp.png" alt="preview"/>
       </Box>
     </Box>
     <Typography
