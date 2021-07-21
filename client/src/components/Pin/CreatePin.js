@@ -4,15 +4,15 @@ import { withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
+import { Box } from "@material-ui/core";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhotoTwoTone";
-import LandscapeIcon from "@material-ui/icons/LandscapeOutlined";
 import ClearIcon from "@material-ui/icons/Clear";
 import SaveIcon from "@material-ui/icons/SaveTwoTone";
 
 import Context from '../../context';
 import { CREATE_PIN_MUTATION } from "../../graphql/mutations";
 import { useClient } from '../../client';
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 
 const CreatePin = ({ classes }) => {
@@ -62,27 +62,36 @@ const CreatePin = ({ classes }) => {
  
   return (
     <form className={classes.form}>
+      <Box ml={1.5}>
+        { image ? (
+          <img src={image && URL.createObjectURL(image)} alt="preview" width="100%"/>
+        ) : (
+          <Box p={1}>
+            <img src="../../icons8-skateboard-100.png" alt="preview" width="100%"/>
+          </Box>
+        )}
+      </Box>
       <Typography 
         className={classes.alignCenter}
         component="h2"
-        variant="h4"
-        color="secondary"
+        variant="h6"
+        color="primary"
+        align="center"
         >
-          <LandscapeIcon className={classes.iconLarge}></LandscapeIcon>
-        Pin Location
+        Post a new skate spot
       </Typography>
-      <div>
+      <Box p={1}>
         <TextField
           name="title"
           label="title"
-          placeholder="Insert pin title"
+          placeholder="Skate Spot Title"
           onChange={ e => setTitle(e.target.value)}>    
         </TextField>
         <input
           accept="image"
           id="image"
           type="file"
-          className="classes.input"
+          className={classes.input}
           onChange={ e => setImage(e.target.files[0])}>  
         </input>
         <label htmlFor="image">
@@ -95,11 +104,11 @@ const CreatePin = ({ classes }) => {
             <AddAPhotoIcon></AddAPhotoIcon>
           </Button>
         </label>
-      </div>
+      </Box>
       <div className={classes.contentField}>
         <TextField
           name="content"
-          label="Content"
+          label="Spot Description and Notes"
           multiline
           rows={mobileSize ? "3" : "6"}
           margin="normal"
@@ -139,11 +148,11 @@ const styles = theme => ({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
-    paddingBottom: theme.spacing.unit
+    paddingBottom: theme.spacing(1)
   },
   contentField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
     width: "95%"
   },
   input: {
@@ -155,20 +164,20 @@ const styles = theme => ({
   },
   iconLarge: {
     fontSize: 40,
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing(1)
   },
   leftIcon: {
     fontSize: 20,
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing(1)
   },
   rightIcon: {
     fontSize: 20,
-    marginLeft: theme.spacing.unit
+    marginLeft: theme.spacing(1)
   },
   button: {
-    marginTop: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit * 2,
-    marginRight: theme.spacing.unit,
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+    marginRight: theme.spacing(1),
     marginLeft: 0
   }
 });

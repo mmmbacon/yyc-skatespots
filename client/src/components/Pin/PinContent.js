@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
-import FaceIcon from "@material-ui/icons/Face";
 import format from 'date-fns/format';
 
 import CreateComment from '../Comment/CreateComment';
@@ -12,10 +12,13 @@ import Context from '../../context';
 const PinContent = ({ classes }) => {
 
   const { state } = useContext(Context);
-  const { title, content, author, createdAt, comments } = state.currentPin
+  const { title, image, content, author, createdAt, comments } = state.currentPin
 
   return (
-    <div className={classes.root}>
+    <Box display="flex" flexDirection="column" justifyContent="flex-start" alignItems="center" className={classes.root}>
+      <Box ml={1.5}>
+        <img src={image} alt={content} width="100%"/>
+      </Box>
       <Typography
         component="h2" 
         variant="h4" 
@@ -31,7 +34,10 @@ const PinContent = ({ classes }) => {
         color="inherit" 
         gutterBottom
       >
-        <FaceIcon className={classes.icon} />
+        <img className={classes.picture}
+          src={author.picture}
+          alt="Pic"
+        />
         {author.name}
       </Typography>
       <Typography
@@ -53,7 +59,8 @@ const PinContent = ({ classes }) => {
       {/* Pin Comments */}
       <CreateComment></CreateComment>
       <Comments comments={comments}></Comments>
-    </div>
+    
+    </Box>
   )
 };
 
@@ -61,11 +68,17 @@ const styles = theme => ({
   root: {
     padding: "1em 0.5em",
     textAlign: "center",
-    width: "100%"
+    width: "100%",
+    justifyContent: "center"
   },
   icon: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1)
+  },
+  picture: {
+    height: "35px",
+    borderRadius: "90%",
+    marginRight: theme.spacing(1)
   },
   text: {
     display: "flex",

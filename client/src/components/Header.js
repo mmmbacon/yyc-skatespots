@@ -1,10 +1,14 @@
 import React, { useContext } from "react";
 import { withStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import MapIcon from "@material-ui/icons/Map";
-import Typography from "@material-ui/core/Typography";
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import { 
+  AppBar,
+  Toolbar, 
+  Typography
+} from "@material-ui/core";
+
+import { Box } from "@material-ui/core";
+
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import Context from '../context';
 import Signout from '../components/Auth/Signout';
@@ -20,34 +24,42 @@ const Header = ({ classes }) => {
     <AppBar position="static"> 
       <Toolbar> 
         { /* Title Logo*/}
-        <div className={classes.grow}>
-          <MapIcon className={classes.icon}></MapIcon>
-          <Typography
-          className={mobileSize ? classes.mobile : ""}
-          component="h1"
-          variant="h6"
-          color="inherit"
-          noWrap>
-            GeoPins
-          </Typography>
-        </div>
-        {}
+        <Box display="flex" flexDirection="row" justifyContent="space-between" width="100%" alignItems="center">
+          <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-start">
+            <img className={classes.logo} src="../../icons8-roller-skates-50.png" alt="Skate"/>
+            <img className={classes.logo} src="../../icons8-skateboard-50.png" alt="Skate"/>
+            <img className={classes.logo} src="../../icons8-rollerblade-50.png" alt="Skate"/>
+            <img className={classes.logo} src="../../icons8-heart-50.png" alt="Skate"/>
+            <Typography
+            className={mobileSize ? classes.mobileTitle : classes.title }
+            component="h1"
+            variant="h5"
+            color="inherit"
+            noWrap>
+              YYC{ mobileSize ? "" : "SkateSpots"}
+            </Typography>
+          </Box>
         {currentUser && (
-          <div className={classes.grow}>
+          <Box display="flex" flexDirection="row" alignItems="center">
+            <Box mr={1}>
+              <Signout></Signout>
+            </Box>
+            <Box mr={1}>
+              <Typography
+                className={mobileSize ? classes.mobileName : ""}
+                variant="h6"
+                color="inherit"
+                noWrap>
+                {currentUser.name}
+              </Typography>
+            </Box>
             <img className={classes.picture}
               src={currentUser.picture}
-              alt={currentUser.name}
+              alt="Pic"
             />
-            <Typography
-              className={mobileSize ? classes.mobile : ""}
-              variant="h5"
-              color="inherit"
-              noWrap>
-              {currentUser.name}
-              </Typography>
-            <Signout></Signout>
-          </div>
+          </Box>
         )}
+        </Box>
       </Toolbar>
     </AppBar>
   </div>;
@@ -63,17 +75,28 @@ const styles = theme => ({
     alignItems: "center"
   },
   icon: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
     color: "green",
     fontSize: 45
   },
-  mobile: {
-    display: "none"
+  logo: {
+    height: '2.5em',
+  },
+  mobileTitle: {
+    fontSize: '2.5em',
+    marginLeft: '5px'
+  },
+  title: {
+    fontSize: '2.5em',
+    marginLeft: '10px'
+  },
+  mobileName: {
+    display: 'none'
   },
   picture: {
-    height: "50px",
+    height: "35px",
     borderRadius: "90%",
-    marginRight: theme.spacing.unit * 2
+    marginRight: theme.spacing(2)
   }
 });
 

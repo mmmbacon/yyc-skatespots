@@ -5,6 +5,7 @@ const pubsub = new PubSub();
 const PIN_ADDED = "PIN_ADDED";
 const PIN_UPDATED = "PIN_UPDATED";
 const PIN_DELETED = "PIN_DELETED";
+const CREATE_COMMENT = "CREATE_COMMENT";
 
 const authenticated = (next) => (root, args, ctx, info) => {
   if (!ctx.currentUser) {

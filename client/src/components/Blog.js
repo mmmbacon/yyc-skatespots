@@ -6,7 +6,7 @@ import Context from '../context';
 import NoContent from './Pin/NoContent';
 import CreatePin from './Pin/CreatePin';
 import PinContent from './Pin/PinContent';
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const Blog = ({ classes }) => {
 
@@ -39,7 +39,7 @@ const styles = {
     maxHeight: "calc(100vh - 64px)",
     overflowY: "scroll",
     display: "flex",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   rootMobile: {
     maxWidth: "100%",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ReactMapGL, { NavigationControl, Marker, Popup } from 'react-map-gl';
 import { withStyles } from "@material-ui/core/styles";
 import PinIcon from './PinIcon';
@@ -24,20 +24,16 @@ const INITIAL_VIEWPORT = {
 const Map = ({ classes }) => {
 
   const mobileSize = useMediaQuery('(max-width: 650px)');
-
   const client = useClient();
   const { state, dispatch} = useContext(Context);
-
-  useEffect(() => {
-    getPins();
-  }, []);
+  const [popup, setPopup] = useState(null);
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT);
   const [userPosition, setUserPosition] = useState(null);
 
-  useEffect(()=>{
+  useEffect(() => {
+    getPins();
     getUserPosition();
   }, []);
-  const [popup, setPopup] = useState(null);
 
   const getPins = async () => {
     const { getPins } = await client.request(GET_PINS_QUERY);
@@ -46,11 +42,9 @@ const Map = ({ classes }) => {
 
   useEffect(()=>{
     const pinExists = popup && state.pins.findIndex(pin => pin._id === popup._id) > -1;
-    
     if(!pinExists){
       setPopup(null);
     }
-
   }, [state.pins.length]);
 
   const getUserPosition = () =>{
@@ -75,9 +69,8 @@ const Map = ({ classes }) => {
     })
   }
 
-  const hightlightNewPin = pin => {
-    const isNewPin = differenceInMinutes(Date.now(), Number(pin.createdAt)) <= 30
-    return isNewPin ? "limegreen" : "darkblue";
+  const isNewPin = pin =>{
+    return differenceInMinutes(Date.now(), Number(pin.createdAt)) <= 30;
   }
 
   const handleSelectPin = pin => {
@@ -152,8 +145,9 @@ const Map = ({ classes }) => {
       >
         <PinIcon
           size={40}
-          color={ hightlightNewPin(pin)}
+          title={pin.title}
           onClick={()=> handleSelectPin(pin)}
+          isNewPin={ isNewPin(pin) }
         ></PinIcon>
       </Marker>
       ))}
@@ -193,7 +187,6 @@ const Map = ({ classes }) => {
       subscription={PIN_ADDED_SUBSCRIPTION}
       onSubscriptionData={({subscriptionData}) => {
         const { pinAdded } = subscriptionData.data;
-        console.log("pIN aDDDED", {pinAdded});
         dispatch({ type: "CREATE_PIN", payload: pinAdded })
       }}
     ></Subscription>
@@ -201,7 +194,6 @@ const Map = ({ classes }) => {
       subscription={PIN_UPDATED_SUBSCRIPTION}
       onSubscriptionData={({subscriptionData}) => {
         const { pinUpdated } = subscriptionData.data;
-        console.log({pinUpdated});
         dispatch({ type: "CREATE_COMMENT", payload: pinUpdated })
       }}
     ></Subscription>
@@ -209,7 +201,6 @@ const Map = ({ classes }) => {
       subscription={PIN_DELETED_SUBSCRIPTION}
       onSubscriptionData={({subscriptionData}) => {
         const { pinDeleted } = subscriptionData.data;
-        console.log({pinDeleted})
         dispatch({ type: "DELETE_PIN", payload: pinDeleted })
       }}
     ></Subscription>
