@@ -26,10 +26,10 @@ const Header = ({ classes }) => {
         { /* Title Logo*/}
         <Box display="flex" flexDirection="row" justifyContent="space-between" width="100%" alignItems="center">
           <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-start">
-            <img className={classes.logo} src="../../icons8-roller-skates-50.png" alt="Skate"/>
-            <img className={classes.logo} src="../../icons8-skateboard-50.png" alt="Skate"/>
-            <img className={classes.logo} src="../../icons8-rollerblade-50.png" alt="Skate"/>
-            <img className={classes.logo} src="../../icons8-heart-50.png" alt="Skate"/>
+            <img className={classes.logo} src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-roller-skates-50_q5iys5.png" alt="Skate"/>
+            <img className={classes.logo} src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-skateboard-50_hpu6mg.png" alt="Skate"/>
+            <img className={classes.logo} src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-rollerblade-50_kq6iwt.png" alt="Skate"/>
+            <img className={classes.logo} src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-heart-50_kgwnbw.png" alt="Skate"/>
             <Typography
             className={mobileSize ? classes.mobileTitle : classes.title }
             component="h1"
