@@ -36,7 +36,7 @@ const Header = ({ classes }) => {
             variant="h5"
             color="inherit"
             noWrap>
-              YYC{ mobileSize ? "" : "SkateSpots"}
+              skatespot.app
             </Typography>
           </Box>
         {currentUser && (
