@@ -18,7 +18,7 @@ Client:
 ## Screenshots:
 
 User Experience / Creating a Pin / Commenting:
-![Splash](https://imgur.com/a/FGZp1vX)
+![Splash](https://i.imgur.com/6nZLWJ6.gif)
 
 New Spot Creation / UI:
 ![UI](https://i.imgur.com/8vezS8M.png)
