@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ReactMapGL, { NavigationControl, Marker, Popup } from 'react-map-gl';
+
 import { withStyles } from "@material-ui/core/styles";
 import PinIcon from './PinIcon';
 import differenceInMinutes from 'date-fns/difference_in_minutes';
@@ -93,14 +94,14 @@ const Map = ({ classes }) => {
     height="calc(100vh - 64px)"
     mapStyle="mapbox://styles/mapbox/streets-v9"
     mapboxApiAccessToken="pk.eyJ1IjoibW1tYmFjb24iLCJhIjoiY2tyM242cmQ1MjB6OTJ2cXVreDBseWppZyJ9._cnVKPCKgZVGX6Otei3Jlw"
-    onViewportChange={newViewport => setViewport(newViewport)}
+    onViewportChange={setViewport}
     {...viewport}
     onClick={handleMapClick}
     >
       {/* Navigation Control */}
       <div className={classes.navigationControl}>
         <NavigationControl
-          onViewportChange={newViewport => setViewport(newViewport)}
+          onViewportChange={setViewport}
         ></NavigationControl>
       </div>
 

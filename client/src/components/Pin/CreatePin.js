@@ -67,7 +67,7 @@ const CreatePin = ({ classes }) => {
           <img src={image && URL.createObjectURL(image)} alt="preview" width="100%"/>
         ) : (
           <Box p={1}>
-            <img src="../../icons8-skateboard-100.png" alt="preview" width="100%"/>
+            <img src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-skateboard-100_ts7wrr.png" alt="preview" width="100%"/>
           </Box>
         )}
       </Box>
