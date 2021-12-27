@@ -12,6 +12,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import Context from '../context';
 import Signout from '../components/Auth/Signout';
+import Signin from '../components/Auth/Signin';
 
 const Header = ({ classes }) => {
 
@@ -39,7 +40,7 @@ const Header = ({ classes }) => {
               skatespot.app
             </Typography>
           </Box>
-        {currentUser && (
+        {currentUser ? (
           <Box display="flex" flexDirection="row" alignItems="center">
             <Box mr={1}>
               <Signout></Signout>
@@ -57,6 +58,11 @@ const Header = ({ classes }) => {
               src={currentUser.picture}
               alt="Pic"
             />
+          </Box>
+        ) : 
+        (
+          <Box>
+            <Signin></Signin>
           </Box>
         )}
         </Box>

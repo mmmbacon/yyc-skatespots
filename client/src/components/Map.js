@@ -10,7 +10,7 @@ import Typography from "@material-ui/core/Typography";
 import DeleteIcon from "@material-ui/icons/DeleteTwoTone";
 import { Subscription } from "react-apollo";
 
-import { useClient } from '../client';
+// import { useClient } from '../client';
 import { GET_PINS_QUERY } from '../graphql/queries';
 import { DELETE_PIN_MUTATION } from "../graphql/mutations";
 import { PIN_UPDATED_SUBSCRIPTION, PIN_DELETED_SUBSCRIPTION, PIN_ADDED_SUBSCRIPTION} from '../graphql/subscriptions';
@@ -25,19 +25,19 @@ const INITIAL_VIEWPORT = {
 const Map = ({ classes }) => {
 
   const mobileSize = useMediaQuery('(max-width: 650px)');
-  const client = useClient();
+  // const client = useClient();
   const { state, dispatch} = useContext(Context);
   const [popup, setPopup] = useState(null);
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT);
   const [userPosition, setUserPosition] = useState(null);
 
   useEffect(() => {
-    getPins();
+    //getPins();
     getUserPosition();
   }, []);
 
   const getPins = async () => {
-    const { getPins } = await client.request(GET_PINS_QUERY);
+    //const { getPins } = await client.request(GET_PINS_QUERY);
     dispatch({ type: "GET_PINS", payload: getPins });
   }
 
@@ -81,7 +81,7 @@ const Map = ({ classes }) => {
 
   const handleDeletePin = async pin => {
     const variables = { pinId: pin._id }
-    await client.request(DELETE_PIN_MUTATION, variables);
+    // await client.request(DELETE_PIN_MUTATION, variables);
     setPopup(null);
   }
 
