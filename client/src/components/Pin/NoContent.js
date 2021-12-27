@@ -27,7 +27,8 @@ const NoContent = ({ classes }) => {
 
 const styles = theme => ({
   root: {
-    display: "flex",
+    maxWidth: 0,
+    display: "none",
     alignItems: "center",
     flexDirection: "column",
     justifyContent: "center",

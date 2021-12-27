@@ -26,7 +26,8 @@ const Blog = ({ classes }) => {
   }
 
   return (
-    <Paper className={mobileSize ? classes.rootMobile : classes.root}>
+    <Paper 
+      className={mobileSize ? classes.rootMobile : classes.root}>
       <BlogContent></BlogContent>
     </Paper>
   );
@@ -34,11 +35,8 @@ const Blog = ({ classes }) => {
 
 const styles = {
   root: {
-    minWidth: 350,
-    maxWidth: 400,
     maxHeight: "calc(100vh - 64px)",
     overflowY: "scroll",
-    display: "flex",
     justifyContent: "center",
   },
   rootMobile: {
