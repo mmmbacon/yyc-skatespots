@@ -14,8 +14,8 @@ import { Box } from "@material-ui/core";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import Context from '../context';
-import Signout from '../components/Auth/Signout';
-import LoginModal from '../components/Auth/LoginModal';
+import Signout from './Auth/Signout';
+import LoginModal from './Auth/LoginModal';
 
 const Header = ({ classes }) => {
 
