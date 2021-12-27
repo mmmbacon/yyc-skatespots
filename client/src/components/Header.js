@@ -3,7 +3,10 @@ import { withStyles } from "@material-ui/core/styles";
 import { 
   AppBar,
   Toolbar, 
-  Typography
+  Typography,
+  Modal,
+  Paper,
+  Link
 } from "@material-ui/core";
 
 import { Box } from "@material-ui/core";
@@ -12,14 +15,19 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import Context from '../context';
 import Signout from '../components/Auth/Signout';
-import Signin from '../components/Auth/Signin';
+import LoginModal from '../components/Auth/LoginModal';
 
 const Header = ({ classes }) => {
 
   const mobileSize = useMediaQuery('(max-width:650px)');
 
   const { state } = useContext(Context);
-  const {currentUser } = state;
+  const { currentUser } = state;
+
+  // Modal State
+  const [openLoginModal, setOpenLoginModal] = React.useState(false);
+  const handleOpenLoginModal = () => setOpenLoginModal(true);
+  const handleCloseLoginModal = () => setOpenLoginModal(false);
 
   return <div className={classes.root}>
     <AppBar position="static"> 
@@ -62,11 +70,24 @@ const Header = ({ classes }) => {
         ) : 
         (
           <Box>
-            <Signin></Signin>
+            <Link 
+              component="button" 
+              variant="body2"
+              className={classes.loginLink}
+              onClick={handleOpenLoginModal}>Log In</Link>
           </Box>
         )}
         </Box>
       </Toolbar>
+      <Modal
+        open={openLoginModal}
+        onClose={handleCloseLoginModal}>
+        <Paper className={classes.panel}>
+          <Box>
+            <LoginModal onSuccess={handleCloseLoginModal}></LoginModal>
+          </Box>
+        </Paper>
+      </Modal>
     </AppBar>
   </div>;
 };
@@ -103,6 +124,17 @@ const styles = theme => ({
     height: "35px",
     borderRadius: "90%",
     marginRight: theme.spacing(2)
+  },
+  panel: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    padding: 50
+  },
+  loginLink: {
+    color: 'white',
+    fontSize: '1.5em'
   }
 });
 
