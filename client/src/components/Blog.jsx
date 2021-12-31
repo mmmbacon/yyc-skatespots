@@ -35,12 +35,12 @@ const Blog = ({ classes }) => {
 
 const styles = {
   root: {
+    maxWidth: 350,
     maxHeight: "calc(100vh - 64px)",
     overflowY: "scroll",
     justifyContent: "center",
   },
   rootMobile: {
-    maxWidth: "100%",
     maxHeight: 300,
     overflowX: "hidden",
     overflowY: "scroll"

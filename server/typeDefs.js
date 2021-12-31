@@ -37,6 +37,11 @@ input CreatePinInput {
 type Query {
   me: User
   getPins: [Pin!]
+  getPinsProximity(
+    lat: Float = 0.0, 
+    lng: Float = 0.0,
+    rng: Float = 0.0
+  ): [Pin!]
 }
 
 type Mutation {

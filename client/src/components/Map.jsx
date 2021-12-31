@@ -12,12 +12,14 @@ import DeleteIcon from '@material-ui/icons/DeleteTwoTone';
 import { Subscription } from 'react-apollo';
 import PinIcon from './PinIcon';
 
-// import { useClient } from '../client';
-import { GET_PINS_QUERY } from '../graphql/queries';
+import { useClient } from '../client';
+import { GET_PINS_QUERY, GET_PINS_PROXIMITY_QUERY } from '../graphql/queries';
 import { DELETE_PIN_MUTATION } from '../graphql/mutations';
 import { PIN_UPDATED_SUBSCRIPTION, PIN_DELETED_SUBSCRIPTION, PIN_ADDED_SUBSCRIPTION } from '../graphql/subscriptions';
 import Blog from './Blog';
 import Context from '../context';
+
+const RANGE = 0.04;
 
 const INITIAL_VIEWPORT = {
   latitude: 37.7577,
@@ -26,21 +28,15 @@ const INITIAL_VIEWPORT = {
 };
 function Map({ classes }) {
   const mobileSize = useMediaQuery('(max-width: 650px)');
-  // const client = useClient();
+  const client = useClient();
   const { state, dispatch } = useContext(Context);
   const [popup, setPopup] = useState(null);
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT);
   const [userPosition, setUserPosition] = useState(null);
 
   useEffect(() => {
-    // getPins();
-    getUserPosition();
+    const position = getUserPosition();
   }, []);
-
-  const getPins = async () => {
-    // const { getPins } = await client.request(GET_PINS_QUERY);
-    dispatch({ type: 'GET_PINS', payload: getPins });
-  };
 
   useEffect(() => {
     const pinExists = popup && state.pins.findIndex((pin) => pin._id === popup._id) > -1;
@@ -49,12 +45,27 @@ function Map({ classes }) {
     }
   }, [state.pins.length]);
 
+  const getPins = async () => {
+    const { getPins } = await client.request(GET_PINS_QUERY);
+    dispatch({ type: 'GET_PINS', payload: getPins });
+  };
+
+  const getPinsProximity = async ( position ) => {
+    if(position){
+      const { latitude, longitude } = position;
+      const { getPinsProximity } = await client.request(GET_PINS_PROXIMITY_QUERY(latitude, longitude, RANGE));
+      dispatch({ type: 'GET_PINS', payload: getPinsProximity });
+    }
+  };
+
   const getUserPosition = () => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
         setViewport({ ...viewport, latitude, longitude });
         setUserPosition({ latitude, longitude });
+        const coords = { latitude, longitude };
+        getPinsProximity(coords);
       });
     }
   };
@@ -73,6 +84,17 @@ function Map({ classes }) {
     }
   };
 
+  const handleMapViewportChange = (viewportState) => {
+    setViewport(viewportState);
+  }
+
+  const handleEndMapDrag = (viewport) => {
+    getPinsProximity({ 
+      latitude: viewport.latitude, 
+      longitude: viewport.longitude
+    });
+  }
+
   const isNewPin = (pin) => differenceInMinutes(Date.now(), Number(pin.createdAt)) <= 30;
 
   const handleSelectPin = (pin) => {
@@ -82,11 +104,11 @@ function Map({ classes }) {
 
   const handleDeletePin = async (pin) => {
     const variables = { pinId: pin._id };
-    // await client.request(DELETE_PIN_MUTATION, variables);
+    await client.request(DELETE_PIN_MUTATION, variables);
     setPopup(null);
   };
 
-  const isAuthUser = () => state.currentUser._id === popup.author._id;
+  const isAuthUser = () => state.currentUser && state.currentUser._id === popup.author._id;
 
   return (
     <div className={mobileSize ? classes.rootMobile : classes.root}>
@@ -96,14 +118,21 @@ function Map({ classes }) {
         height="calc(100vh - 64px)"
         mapStyle="mapbox://styles/mapbox/streets-v9"
         mapboxApiAccessToken="pk.eyJ1IjoibW1tYmFjb24iLCJhIjoiY2tyM242cmQ1MjB6OTJ2cXVreDBseWppZyJ9._cnVKPCKgZVGX6Otei3Jlw"
-        onViewportChange={setViewport}
+        onViewportChange={ (viewportState) => handleMapViewportChange(viewportState)}
+        onInteractionStateChange={(e)=>{
+
+          if(!e.isDragging){
+            console.log(viewport)
+            handleEndMapDrag(viewport);
+          }
+        }}
         {...viewport}
         onClick={handleMapClick}
       >
         {/* Navigation Control */}
         <div className={classes.navigationControl}>
           <NavigationControl
-            onViewportChange={setViewport}
+            onViewportChange={ (viewportState) => handleMapViewportChange(viewportState)}
           />
         </div>
 
