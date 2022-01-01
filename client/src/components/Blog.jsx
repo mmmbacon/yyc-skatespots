@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { Paper } from "@material-ui/core";
-
+import IconButton from "@material-ui/core/IconButton";
+import ClearIcon from "@material-ui/icons/Clear";
 import Context from '../context';
 import NoContent from './Pin/NoContent';
 import CreatePin from './Pin/CreatePin';
@@ -12,8 +13,15 @@ const Blog = ({ classes }) => {
 
   const mobileSize = useMediaQuery('(max-width:650px)');
 
-  const { state } = useContext(Context);
+  const { state, dispatch } = useContext(Context);
   const { draft, currentPin } = state;
+
+  const handleClose = () => {
+    dispatch({ type: 'SET_PIN', payload: null });
+    if(draft){
+      dispatch({ type: "DELETE_DRAFT"});
+    }
+  }
 
   let BlogContent;
 
@@ -28,6 +36,11 @@ const Blog = ({ classes }) => {
   return (
     <Paper 
       className={mobileSize ? classes.rootMobile : classes.root}>
+      <div class={`${classes.header} ${draft || currentPin ? '' : classes.hidden}`}>
+        <IconButton onClick={handleClose}>
+          <ClearIcon />
+        </IconButton>
+      </div>
       <BlogContent></BlogContent>
     </Paper>
   );
@@ -44,6 +57,13 @@ const styles = {
     maxHeight: 300,
     overflowX: "hidden",
     overflowY: "scroll"
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row'
+  },
+  hidden: {
+    display: 'none'
   }
 };
 
