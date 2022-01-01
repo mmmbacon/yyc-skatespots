@@ -74,6 +74,7 @@ const LoginModal = (props) => {
       const client = new GraphQLClient(BASE_URL, {
         headers: { authorization: idToken }
       });
+      console.log(client)
       const { me } = await client.request(ME_QUERY);
       dispatch({ type: "LOGIN_USER", payload: me });
       dispatch({ type: "IS_LOGGED_IN", payload: googleUser.isSignedIn }); 
@@ -117,7 +118,6 @@ const LoginModal = (props) => {
       clientId="643653378187-86ac0rdsdlkso7mf9g0mfdeun94dsv0k.apps.googleusercontent.com" 
       onSuccess={onSuccess}
       onFailure={onFailure}
-      isSignedIn={true}
       theme="dark">
     </GoogleLogin>
       </div>

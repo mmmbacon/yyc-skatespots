@@ -17,9 +17,11 @@ const CreateComment = ({ classes }) => {
   const { state } = useContext(Context);
 
   const handleSubmitComment = async () => {
-    const variables = { pinId: state.currentPin._id, text: comment};
-    await client.request(CREATE_COMMENT_MUTATION, variables);
-    setComment("");
+    if(state.currentUser){
+      const variables = { pinId: state.currentPin._id, text: comment};
+      await client.request(CREATE_COMMENT_MUTATION, variables);
+      setComment("");
+    }
   }
 
   return (
