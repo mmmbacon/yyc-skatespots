@@ -18,7 +18,7 @@ const PinContent = ({ classes }) => {
 
   return (
     <Box display="flex" flexDirection="column" justifyContent="flex-start" alignItems="center" className={classes.root}>
-      <Box ml={1.5}>
+      <Box>
         <img src={image} alt={content} width="100%"/>
       </Box>
       <Typography
@@ -74,7 +74,6 @@ const styles = theme => ({
   root: {
     padding: "1em 0.5em",
     textAlign: "center",
-    width: "100%",
     justifyContent: "center"
   },
   icon: {
@@ -84,7 +83,6 @@ const styles = theme => ({
   picture: {
     height: "35px",
     borderRadius: "90%",
-    marginRight: theme.spacing(1)
   },
   text: {
     display: "flex",

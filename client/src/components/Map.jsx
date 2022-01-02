@@ -251,6 +251,7 @@ function Map({ classes }) {
 const styles = {
   root: {
     display: 'flex',
+    flexDirection: 'row'
   },
   rootMobile: {
     display: 'flex',
