@@ -216,7 +216,7 @@ function Map({ classes }) {
       </ReactMapGL>
 
       {/* Subscriptions for Creating / Updating and Deleting Pins */}
-      {client.currentUser && (
+      {state.currentUser && (
         <>
           <Subscription
             subscription={PIN_ADDED_SUBSCRIPTION}

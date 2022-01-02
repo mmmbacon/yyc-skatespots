@@ -4,13 +4,15 @@ import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import format from 'date-fns/format';
-
 import CreateComment from '../Comment/CreateComment';
 import Comments from '../Comment/Comments';
 import Context from '../../context';
+import { useClient } from '../../client';
+
 
 const PinContent = ({ classes }) => {
-
+  
+  const client = useClient();
   const { state } = useContext(Context);
   const { title, image, content, author, createdAt, comments } = state.currentPin
 
@@ -57,7 +59,11 @@ const PinContent = ({ classes }) => {
       </Typography>
 
       {/* Pin Comments */}
-      <CreateComment></CreateComment>
+      {state.currentUser ? (
+        <CreateComment></CreateComment>
+      ) : (
+        <div>Please login to leave a comment</div>
+      )}
       <Comments comments={comments}></Comments>
     
     </Box>
