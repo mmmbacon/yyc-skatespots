@@ -36,7 +36,7 @@ const Blog = ({ classes }) => {
   return (
     <Paper 
       square
-      className={mobileSize ? classes.rootMobile : classes.root}>
+      className={mobileSize ? classes.rootMobile : `${classes.root} ${draft || currentPin ? classes.shadow : ''}`}>
       <div class={`${classes.header} ${draft || currentPin ? '' : classes.hidden}`}>
         <IconButton onClick={handleClose}>
           <ClearIcon />
@@ -53,7 +53,6 @@ const styles = {
     maxHeight: "calc(100vh - 64px)",
     overflowY: "scroll",
     justifyContent: "center",
-    boxShadow: '-15px 0px 15px rgba(0,0,0,0.1)',
     zIndex: 9999
   },
   rootMobile: {
@@ -66,7 +65,10 @@ const styles = {
     flexDirection: 'row'
   },
   hidden: {
-    display: 'none'
+    display: 'none',
+  },
+  shadow: {
+    boxShadow: '-15px 0px 15px rgba(0,0,0,0.1)',
   }
 };
 
