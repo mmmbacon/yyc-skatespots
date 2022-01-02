@@ -35,6 +35,7 @@ const Blog = ({ classes }) => {
 
   return (
     <Paper 
+      square
       className={mobileSize ? classes.rootMobile : classes.root}>
       <div class={`${classes.header} ${draft || currentPin ? '' : classes.hidden}`}>
         <IconButton onClick={handleClose}>
@@ -52,6 +53,8 @@ const styles = {
     maxHeight: "calc(100vh - 64px)",
     overflowY: "scroll",
     justifyContent: "center",
+    boxShadow: '-15px 0px 15px rgba(0,0,0,0.1)',
+    zIndex: 9999
   },
   rootMobile: {
     maxHeight: 300,
