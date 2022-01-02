@@ -5,6 +5,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Typography, Box, Link } from "@material-ui/core";
 import GitHubIcon from '@material-ui/icons/GitHub';
 
+import { TextField, Button } from "@material-ui/core";
+
 import Context from '../../context';
 import { ME_QUERY } from '../../graphql/queries';
 import { BASE_URL } from '../../client';
@@ -16,6 +18,16 @@ const useStyles = vars => makeStyles( theme => ({
     justifyContent: "center",
     flexDirection: "column",
     alignItems: "center"
+  },
+  button: {
+    margin: 5
+  },
+  loginButton: {
+    margin: 5,
+    marginTop: 10
+  },
+  googleLogin: {
+    marginTop: 10,
   },
   social: {
     position: 'absolute',
@@ -39,6 +51,9 @@ const useStyles = vars => makeStyles( theme => ({
   icon: {
     height: "40px",
     animation: `$oscillate 500ms ease-in-out ${vars.delay}s infinite`,
+  },
+  input: {
+    marginBottom: '1em',
   },
   mobileIcon: {
     height: "50px",
@@ -68,28 +83,41 @@ const LoginModal = (props) => {
   const {dispatch} = useContext(Context);
   const mobileSize = useMediaQuery('(max-width:650px)');
 
-  const onSuccess = async googleUser => {
+  const handleGoogleLoginSuccess = async googleUser => {
     try{
       const idToken = googleUser.getAuthResponse().id_token;
       const client = new GraphQLClient(BASE_URL, {
         headers: { authorization: idToken }
       });
-      console.log(client)
       const { me } = await client.request(ME_QUERY);
       dispatch({ type: "LOGIN_USER", payload: me });
       dispatch({ type: "IS_LOGGED_IN", payload: googleUser.isSignedIn }); 
       props.onSuccess();
     }catch(err){
-      onFailure(err);
+      handleLoginFailure(err);
     }
   };
 
-  const onFailure = err =>{
+  const handleBasicLogin = async (email, password) => {
+    try{
+      const client = new GraphQLClient(BASE_URL, {
+        body: { email, password }
+      });
+      const { me } = await client.request(ME_QUERY);
+      dispatch({ type: "LOGIN_USER", payload: me });
+      dispatch({ type: "IS_LOGGED_IN", payload: true }); 
+      props.onSuccess();
+    }catch(err){
+      handleLoginFailure(err);
+    }
+  }
+
+  const handleLoginFailure = err =>{
     console.error("Error Logging in ", err);
     dispatch({ type: "IS_LOGGED_IN", payload: false });
   }
   return <div className={classes.root}>
-    <Box display="flex" flexDirection="row">
+    <Box display="flex" flexDirection="row" mb={3}>
       <Box p={1} >
         <img className={ mobileSize ? logo1classes.mobileIcon : logo1classes.icon} src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-roller-skates-100_p7oamy.png" alt="preview"/>
       </Box>
@@ -104,7 +132,7 @@ const LoginModal = (props) => {
       </Box>
     </Box>
 
-    <Typography
+    {/* <Typography
     className={mobileSize ? classes.mobileTitle : classes.title}
     component="h1"
     variant="h5"
@@ -112,12 +140,17 @@ const LoginModal = (props) => {
     noWrap
     color="primary">
       Log In
-    </Typography>
+    </Typography> */}
+    <TextField className={classes.input} label="email" variant="outlined"></TextField>
+    <TextField className={classes.input} label="password" type="password" variant="outlined"></TextField>
+    <Button className={classes.loginButton} color="primary" variant="contained">Log In</Button>
+    <Button className={classes.button} color="primary">Register</Button>
     <GoogleLogin 
+      className={classes.googleLogin}
       buttonText="Login with Google"
       clientId="643653378187-86ac0rdsdlkso7mf9g0mfdeun94dsv0k.apps.googleusercontent.com" 
-      onSuccess={onSuccess}
-      onFailure={onFailure}
+      onSuccess={handleGoogleLoginSuccess}
+      onFailure={handleLoginFailure}
       theme="dark">
     </GoogleLogin>
       </div>

@@ -74,7 +74,16 @@ const Header = ({ classes }) => {
               component="button" 
               variant="body2"
               className={classes.loginLink}
-              onClick={handleOpenLoginModal}>Log In</Link>
+              onClick={handleOpenLoginModal}>
+              About
+            </Link>
+            <Link 
+              component="button" 
+              variant="body2"
+              className={classes.loginLink}
+              onClick={handleOpenLoginModal}>
+              Log In
+            </Link>
           </Box>
         )}
         </Box>
@@ -134,7 +143,8 @@ const styles = theme => ({
   },
   loginLink: {
     color: 'white',
-    fontSize: '1.5em'
+    fontSize: '1.3em',
+    marginRight: '0.5em'
   }
 });
 

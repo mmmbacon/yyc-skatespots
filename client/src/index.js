@@ -5,6 +5,7 @@ import ProtectedRoute from './ProtectedRoute';
 
 import App from "./pages/App";
 import Splash from "./pages/Splash";
+import Register from "./pages/Register";
 import Context from './context';
 import Reducer from './reducer';
 
@@ -40,7 +41,7 @@ const Root = () => {
         <Context.Provider value={{ state, dispatch }}>
           <Switch>
             <Route exact path="/" component={App} />
-            <Route path="/login" component={Splash} />
+            <Route path="/register" component={Register} />
           </Switch>
         </Context.Provider>
       </ApolloProvider>
