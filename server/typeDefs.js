@@ -3,8 +3,10 @@ const { gql } = require('apollo-server');
 module.exports = gql`
 type User {
   _id: ID
+  username: String
   name: String
   email: String
+  password: String
   picture: String
 }
 
@@ -34,6 +36,17 @@ input CreatePinInput {
   longitude: Float
 }
 
+input CreateUserInput {
+  username: String
+  email: String
+  password: String
+}
+
+input LoginUser {
+  email: String
+  password: String
+}
+
 type Query {
   me: User
   getPins: [Pin!]
@@ -48,6 +61,8 @@ type Mutation {
   createPin(input: CreatePinInput!): Pin
   deletePin(pinId: ID!): Pin
   createComment(pinId: ID!, text: String!): Pin
+  createNewUser(input: CreateUserInput): User
+  loginUser(input: LoginUser): User
 }
 
 type Subscription {

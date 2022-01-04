@@ -34,6 +34,7 @@ const server = new ApolloServer({
       }
 
       if (username) {
+        console.log('username');
         currentUser = await createBasicUser(email, password, username);
       }
 

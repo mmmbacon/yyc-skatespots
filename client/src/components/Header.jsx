@@ -59,13 +59,15 @@ const Header = ({ classes }) => {
                 variant="h6"
                 color="inherit"
                 noWrap>
-                {currentUser.name}
+                {currentUser.username}
               </Typography>
             </Box>
-            <img className={classes.picture}
+            {currentUser.picture && (
+              <img className={classes.picture}
               src={currentUser.picture}
               alt="Pic"
             />
+            )}
           </Box>
         ) : 
         (

@@ -1,5 +1,9 @@
+const bcrypt = require('bcrypt');
+
 const { AuthenticationError, PubSub } = require('apollo-server');
+
 const Pin = require('./models/Pin');
+const User = require('./models/User');
 
 const pubsub = new PubSub();
 const PIN_ADDED = 'PIN_ADDED';
@@ -13,6 +17,28 @@ const authenticated = (next) => (root, args, ctx, info) => {
   }
 
   return next(root, args, ctx, info);
+};
+
+const hash = (plaintextPassword) => {
+  const saltRounds = 10;
+  bcrypt.genSalt(saltRounds, (err, salt) => {
+    bcrypt.hash(plaintextPassword, salt, (errX, hashX) => {
+      if (!errX) {
+        return hashX;
+      }
+      return errX;
+    });
+  });
+};
+
+const compare = (plaintextPassword, hashed) => {
+  bcrypt.compare(plaintextPassword, hashed, (err, result) => {
+    // result == true
+    if (!err) {
+      return result;
+    }
+    return err;
+  });
 };
 
 module.exports = {
@@ -66,6 +92,31 @@ module.exports = {
       pubsub.publish(PIN_UPDATED, { pinUpdated });
       return pinUpdated;
     }),
+    createNewUser: async (root, args, ctx) => {
+      const user = await User.find({ email: args.input.email }).exec();
+
+      let newUser = {};
+
+      if (user.length < 1) {
+        const userInfo = {
+          email: args.input.email,
+          password: hash(args.input.password),
+          username: args.input.username,
+        };
+        newUser = await new User(userInfo).save();
+      }
+
+      return newUser;
+    },
+    loginUser: async (root, args, ctx) => {
+      const user = await User.find({ email: args.input.email }).exec();
+      if (user) {
+        if (compare(args.input.password, user.password)) {
+          return user;
+        }
+      }
+      return {};
+    },
   },
   Subscription: {
     pinAdded: {

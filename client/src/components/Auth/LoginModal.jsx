@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { GraphQLClient } from 'graphql-request';
 import { GoogleLogin } from 'react-google-login';
 import { makeStyles } from "@material-ui/core/styles";
@@ -9,6 +9,7 @@ import { TextField, Button } from "@material-ui/core";
 
 import Context from '../../context';
 import { ME_QUERY } from '../../graphql/queries';
+import { CREATE_NEW_USER_MUTATION, LOGIN_MUTATION } from '../../graphql/mutations';
 import { BASE_URL } from '../../client';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
@@ -27,7 +28,7 @@ const useStyles = vars => makeStyles( theme => ({
     marginTop: 10
   },
   googleLogin: {
-    marginTop: 10,
+    marginTop: 20,
   },
   social: {
     position: 'absolute',
@@ -80,6 +81,12 @@ const LoginModal = (props) => {
   const logo3classes = useStyles({ delay: 0.2 })();
   const logo4classes = useStyles({ delay: 0.3 })();
 
+  const [ register, setRegister ] = useState(false);
+
+  const [ usernameField, setUsernameField ] = useState("");
+  const [ emailField, setEmailField ] = useState("");
+  const [ passwordField , setPasswordField ] = useState("");
+
   const {dispatch} = useContext(Context);
   const mobileSize = useMediaQuery('(max-width:650px)');
 
@@ -100,11 +107,23 @@ const LoginModal = (props) => {
 
   const handleBasicLogin = async (email, password) => {
     try{
-      const client = new GraphQLClient(BASE_URL, {
-        body: { email, password }
-      });
-      const { me } = await client.request(ME_QUERY);
-      dispatch({ type: "LOGIN_USER", payload: me });
+      const client = new GraphQLClient(BASE_URL);
+      const { loginUser } = await client.request(LOGIN_MUTATION, {email: emailField, password: passwordField});
+      const { email, username } = loginUser;
+      dispatch({ type: "LOGIN_USER", payload: loginUser });
+      dispatch({ type: "IS_LOGGED_IN", payload: true }); 
+      props.onSuccess();
+    }catch(err){
+      handleLoginFailure(err);
+    }
+  }
+
+  const handleRegister = async () => {
+    try{
+      const client = new GraphQLClient(BASE_URL);
+      const { createNewUser } = await client.request(CREATE_NEW_USER_MUTATION, { email: emailField, password: passwordField, username: usernameField});
+      const { email, username } = createNewUser;
+      dispatch({ type: "LOGIN_USER", payload: createNewUser });
       dispatch({ type: "IS_LOGGED_IN", payload: true }); 
       props.onSuccess();
     }catch(err){
@@ -116,6 +135,12 @@ const LoginModal = (props) => {
     console.error("Error Logging in ", err);
     dispatch({ type: "IS_LOGGED_IN", payload: false });
   }
+
+
+  const handleRegisterToggle = () => {
+    setRegister(true);
+  }
+
   return <div className={classes.root}>
     <Box display="flex" flexDirection="row" mb={3}>
       <Box p={1} >
@@ -132,19 +157,44 @@ const LoginModal = (props) => {
       </Box>
     </Box>
 
-    {/* <Typography
+    <Typography
     className={mobileSize ? classes.mobileTitle : classes.title}
     component="h1"
     variant="h5"
     gutterBottom
     noWrap
     color="primary">
-      Log In
-    </Typography> */}
-    <TextField className={classes.input} label="email" variant="outlined"></TextField>
-    <TextField className={classes.input} label="password" type="password" variant="outlined"></TextField>
-    <Button className={classes.loginButton} color="primary" variant="contained">Log In</Button>
-    <Button className={classes.button} color="primary">Register</Button>
+      {`${register ? 'Register' : 'Login'}`}
+    </Typography>
+    { register && (
+      <TextField 
+        className={classes.input} 
+        label="username" 
+        variant="outlined"
+        value={usernameField}
+        onChange={ event => setUsernameField(event.target.value)}></TextField>
+    )}
+    <TextField 
+      className={classes.input} 
+      label="email" 
+      variant="outlined"
+      value={emailField}
+      onChange={ event => setEmailField(event.target.value)}></TextField>
+    <TextField 
+      className={classes.input} 
+      label="password" 
+      variant="outlined"
+      type="password"
+      value={passwordField}
+      onChange={ event => setPasswordField(event.target.value)}></TextField>
+    { register ? (
+        <Button className={classes.loginButton} color="primary" variant="contained" onClick={handleRegister}>Register</Button>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <Button className={classes.loginButton} color="primary" variant="contained">Log In</Button>  
+          <Button className={classes.button} color="primary" onClick={handleRegisterToggle}>Register</Button>
+        </div>
+      )}
     <GoogleLogin 
       className={classes.googleLogin}
       buttonText="Login with Google"

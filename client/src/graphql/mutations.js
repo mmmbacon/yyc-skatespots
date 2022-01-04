@@ -30,7 +30,6 @@ export const DELETE_PIN_MUTATION = `
     }
   }
 `
-
 export const CREATE_COMMENT_MUTATION = `
   mutation($pinId: ID!, $text: String!){
     createComment(pinId: $pinId, text: $text){
@@ -53,6 +52,31 @@ export const CREATE_COMMENT_MUTATION = `
           picture
         }
       }
+    }
+  }
+`
+export const CREATE_NEW_USER_MUTATION = `
+  mutation($email: String!, $password: String!, $username: String! ){
+    createNewUser(input: {
+      email: $email,
+      password: $password,
+      username: $username
+    }){
+      _id
+      email
+      username
+    }
+  }
+`
+export const LOGIN_MUTATION = `
+  mutation($email: String!, $password: String!){
+    loginUser(input: {
+      email: $email,
+      password: $password,
+    }){
+      _id
+      email
+      username
     }
   }
 `
