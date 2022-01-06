@@ -19,26 +19,16 @@ const authenticated = (next) => (root, args, ctx, info) => {
   return next(root, args, ctx, info);
 };
 
-const hash = (plaintextPassword) => {
+const hash = async (plaintextPassword) => {
   const saltRounds = 10;
-  bcrypt.genSalt(saltRounds, (err, salt) => {
-    bcrypt.hash(plaintextPassword, salt, (errX, hashX) => {
-      if (!errX) {
-        return hashX;
-      }
-      return errX;
-    });
-  });
+  const salt = await bcrypt.genSalt(saltRounds);
+  const hashed = await bcrypt.hash(plaintextPassword, salt);
+  return hashed;
 };
 
-const compare = (plaintextPassword, hashed) => {
-  bcrypt.compare(plaintextPassword, hashed, (err, result) => {
-    // result == true
-    if (!err) {
-      return result;
-    }
-    return err;
-  });
+const compare = async (plaintextPassword, hashed) => {
+  const result = await bcrypt.compare(plaintextPassword, hashed);
+  return result;
 };
 
 module.exports = {
@@ -100,7 +90,7 @@ module.exports = {
       if (user.length < 1) {
         const userInfo = {
           email: args.input.email,
-          password: hash(args.input.password),
+          password: await hash(args.input.password),
           username: args.input.username,
         };
         newUser = await new User(userInfo).save();
@@ -109,9 +99,9 @@ module.exports = {
       return newUser;
     },
     loginUser: async (root, args, ctx) => {
-      const user = await User.find({ email: args.input.email }).exec();
+      const user = await User.findOne({ email: args.input.email }).exec();
       if (user) {
-        if (compare(args.input.password, user.password)) {
+        if (await compare(args.input.password, user.password)) {
           return user;
         }
       }

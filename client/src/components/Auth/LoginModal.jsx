@@ -25,7 +25,8 @@ const useStyles = vars => makeStyles( theme => ({
   },
   loginButton: {
     margin: 5,
-    marginTop: 10
+    marginTop: 10,
+    width: 100,
   },
   googleLogin: {
     marginTop: 20,
@@ -105,11 +106,10 @@ const LoginModal = (props) => {
     }
   };
 
-  const handleBasicLogin = async (email, password) => {
+  const handleBasicLogin = async () => {
     try{
       const client = new GraphQLClient(BASE_URL);
       const { loginUser } = await client.request(LOGIN_MUTATION, {email: emailField, password: passwordField});
-      const { email, username } = loginUser;
       dispatch({ type: "LOGIN_USER", payload: loginUser });
       dispatch({ type: "IS_LOGGED_IN", payload: true }); 
       props.onSuccess();
@@ -122,7 +122,6 @@ const LoginModal = (props) => {
     try{
       const client = new GraphQLClient(BASE_URL);
       const { createNewUser } = await client.request(CREATE_NEW_USER_MUTATION, { email: emailField, password: passwordField, username: usernameField});
-      const { email, username } = createNewUser;
       dispatch({ type: "LOGIN_USER", payload: createNewUser });
       dispatch({ type: "IS_LOGGED_IN", payload: true }); 
       props.onSuccess();
@@ -136,9 +135,12 @@ const LoginModal = (props) => {
     dispatch({ type: "IS_LOGGED_IN", payload: false });
   }
 
-
   const handleRegisterToggle = () => {
-    setRegister(true);
+    if(register){
+      setRegister(false);
+    }else{
+      setRegister(true);
+    }
   }
 
   return <div className={classes.root}>
@@ -188,10 +190,13 @@ const LoginModal = (props) => {
       value={passwordField}
       onChange={ event => setPasswordField(event.target.value)}></TextField>
     { register ? (
-        <Button className={classes.loginButton} color="primary" variant="contained" onClick={handleRegister}>Register</Button>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <Button className={classes.button} color="primary" onClick={handleRegisterToggle}>Login</Button>
+          <Button className={classes.loginButton} color="primary" variant="contained" onClick={handleRegister}>Register</Button>
+        </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <Button className={classes.loginButton} color="primary" variant="contained">Log In</Button>  
+          <Button className={classes.loginButton} color="primary" variant="contained" onClick={handleBasicLogin}>Log In</Button>  
           <Button className={classes.button} color="primary" onClick={handleRegisterToggle}>Register</Button>
         </div>
       )}
