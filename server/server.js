@@ -1,11 +1,25 @@
+/* eslint-disable import/extensions */
 /* eslint-disable no-console */
-const { ApolloServer } = require('apollo-server');
+import { AccountsServer } from '@accounts/server';
+import { AccountsPassword } from '@accounts/password';
+import { Mongo as MongoDBInterface } from '@accounts/mongo';
+import { AccountsModule } from '@accounts/graphql-api';
+import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge';
 
-const mongoose = require('mongoose');
-const typeDefs = require('./typeDefs');
-const resolvers = require('./resolvers');
-const { findOrCreateGoogleUser, createBasicUser, findBasicUser } = require('./controllers/userController');
-require('dotenv').config();
+import mongoose from 'mongoose';
+
+import { ApolloServer } from 'apollo-server';
+import dotenv from 'dotenv';
+import typeDefs from './typeDefs.js';
+import { resolvers } from './resolvers.js';
+
+// import {
+//   findOrCreateGoogleUser,
+//   createBasicUser,
+//   findBasicUser
+// } from './controllers/userController';
+
+dotenv.config();
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -13,39 +27,28 @@ mongoose.connect(process.env.MONGO_URI, {
 }).then(() => console.log('DB Connected!'))
   .catch((err) => console.error(err));
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: async (context) => {
-    let authToken = null;
-    let email = null;
-    let username = null;
-    let password = null;
-    let currentUser = null;
-    try {
-      authToken = context.req.headers.authorization;
-      email = context.req.body.email;
-      username = context.req.body.username;
-      password = context.req.body.password;
+const db = mongoose.connection;
 
-      if (authToken) {
-        // Find or create user
-        currentUser = await findOrCreateGoogleUser(authToken);
-      }
+const password = new AccountsPassword({});
 
-      if (username) {
-        console.log('username');
-        currentUser = await createBasicUser(email, password, username);
-      }
-
-      if (email && password && !username) {
-        currentUser = await findBasicUser(email, password, username);
-      }
-    } catch (err) {
-      console.error(`Unable to authenticate user with token ${authToken}`, err);
-    }
-    return { currentUser };
+const accountsServer = new AccountsServer(
+  {
+    db: new MongoDBInterface(db),
+    tokenSecret: 'asdfae234ds25@#$',
   },
+  {
+    password,
+  },
+);
+
+const accountsGraphQL = AccountsModule.forRoot({ accountsServer });
+
+const server = new ApolloServer({
+  typeDefs: mergeTypeDefs([typeDefs, accountsGraphQL.typeDefs]),
+  resolvers: mergeResolvers([accountsGraphQL.resolvers, resolvers]),
+  context: async (req) => ({
+    ...(await accountsGraphQL.context(req)),
+  }),
 });
 
 server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {

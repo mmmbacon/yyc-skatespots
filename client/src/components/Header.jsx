@@ -2,20 +2,23 @@ import React, { useContext } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { 
   AppBar,
+  IconButton,
   Toolbar, 
   Typography,
   Modal,
   Paper,
-  Link
+  Link as MUILink
 } from "@material-ui/core";
 
 import { Box } from "@material-ui/core";
-
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import Context from '../context';
 import Signout from './Auth/Signout';
 import LoginModal from './Auth/LoginModal';
+
+import SettingsIcon from '@material-ui/icons/Settings';
+import { Link } from "react-router-dom";
 
 const Header = ({ classes }) => {
 
@@ -68,24 +71,29 @@ const Header = ({ classes }) => {
               alt="Pic"
             />
             )}
+            <Box mr={1}>
+              <IconButton component={Link} to="/settings">
+                <SettingsIcon/>
+              </IconButton>
+            </Box>
           </Box>
         ) : 
         (
           <Box>
-            <Link 
+            <MUILink 
               component="button" 
               variant="body2"
               className={classes.loginLink}
               onClick={handleOpenLoginModal}>
               About
-            </Link>
-            <Link 
+            </MUILink>
+            <MUILink 
               component="button" 
               variant="body2"
               className={classes.loginLink}
               onClick={handleOpenLoginModal}>
               Log In
-            </Link>
+            </MUILink>
           </Box>
         )}
         </Box>

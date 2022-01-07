@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "skatespot.app",
   "version": "1.0.0",
   "description": "",
@@ -11,6 +12,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@accounts/graphql-api": "^0.33.1",
+    "@accounts/magic-link": "^0.1.1",
+    "@accounts/mongo": "^0.33.5",
+    "@accounts/password": "^0.32.1",
+    "@accounts/server": "^0.33.1",
+    "@graphql-modules/core": "^0.7.17",
+    "@graphql-tools/merge": "^8.2.1",
     "apollo-server": "^2.3.1",
     "bcrypt": "^5.0.1",
     "dotenv": "^6.2.0",

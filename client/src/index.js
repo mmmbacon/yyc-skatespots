@@ -1,11 +1,12 @@
 import React, { useContext, useReducer } from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ProtectedRoute from './ProtectedRoute';
 
 import App from "./pages/App";
 import Splash from "./pages/Splash";
 import Register from "./pages/Register";
+import Settings from "./pages/Settings";
 import Context from './context';
 import Reducer from './reducer';
 
@@ -16,6 +17,11 @@ import { ApolloProvider } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
 import { WebSocketLink } from 'apollo-link-ws';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import { AccountsClient } from '@accounts/client';
+import { AccountsClientPassword } from '@accounts/client-password';
+import { AccountsGraphQLClient } from '@accounts/graphql-client';
+import { ApolloLink } from '@apollo/client';
+import { accountsLink } from '@accounts/apollo-link';
 
 const wsLink = new WebSocketLink({
   uri: process.env.NODE_ENV === "production" ? 
@@ -25,10 +31,27 @@ const wsLink = new WebSocketLink({
   }
 });
 
+const authLink = accountsLink(() => accountsClient);
+
 const client = new ApolloClient({
-  link: wsLink,
+  link: ApolloLink.from([wsLink, authLink]),
   cache: new InMemoryCache()
 });
+
+const accountsGraphQL = new AccountsGraphQLClient({
+  graphQLClient: client,
+  //other options like 'userFieldsFragment'
+});
+
+const accountsClient = new AccountsClient(
+  {
+    // accountsClient Options
+  },
+  accountsGraphQL
+);
+
+
+const passwordClient = new AccountsClientPassword(accountsClient);
 
 const Root = () => {
 
@@ -39,10 +62,11 @@ const Root = () => {
     <Router>
       <ApolloProvider client={client}>
         <Context.Provider value={{ state, dispatch }}>
-          <Switch>
+          <Routes>
             <Route exact path="/" component={App} />
             <Route path="/register" component={Register} />
-          </Switch>
+            <Route path="/settings" component={Settings} />
+          </Routes>
         </Context.Provider>
       </ApolloProvider>
       
