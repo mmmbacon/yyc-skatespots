@@ -1,23 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useContext, useMemo } from 'react';
 import { GraphQLClient } from 'graphql-request';
+import Context from './context';
+import { config } from './config';
 
-export const BASE_URL = 
-  process.env.NODE_ENV === "production" ? 
-    "https://geopinr.herokuapp.com/graphql" : "http://localhost:4000/graphql"
-
-export const useClient = () => {
-  const [idToken, setIdToken ] = useState("");
-
-  useEffect(()=>{
-    const token = window.gapi.auth2
-      .getAuthInstance()
-      .currentUser.get()
-      .getAuthResponse().id_token;
-    setIdToken(token);
-  }, []);
-
-  return new GraphQLClient(BASE_URL, {
-    headers: { authorization: idToken }
-  })
-  
+export function useClient() {
+  const { state } = useContext(Context);
+  return useMemo(
+    () =>
+      new GraphQLClient(config.graphqlHttpUrl, {
+        headers: { authorization: state.idToken || '' },
+      }),
+    [state.idToken],
+  );
 }

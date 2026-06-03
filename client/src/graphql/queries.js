@@ -2,6 +2,7 @@ export const ME_QUERY = `
   {
     me {
       _id
+      username
       name
       email
       picture

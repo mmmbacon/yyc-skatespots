@@ -1,3 +1,33 @@
+export const SIGN_UP_MUTATION = `
+  mutation($username: String!, $email: String!, $password: String!) {
+    signUp(username: $username, email: $email, password: $password) {
+      token
+      user {
+        _id
+        username
+        name
+        email
+        picture
+      }
+    }
+  }
+`;
+
+export const SIGN_IN_MUTATION = `
+  mutation($login: String!, $password: String!) {
+    signIn(login: $login, password: $password) {
+      token
+      user {
+        _id
+        username
+        name
+        email
+        picture
+      }
+    }
+  }
+`;
+
 export const CREATE_PIN_MUTATION = `
   mutation($title: String!, $image: String!, $content: String!, $latitude: Float!, $longitude: Float!){
     createPin(input: {
