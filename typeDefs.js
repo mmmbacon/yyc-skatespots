@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+const { gql } = require('graphql-tag');
 
 module.exports = gql`
 type User {
@@ -50,5 +50,4 @@ type Subscription {
   pinDeleted: Pin
   pinUpdated: Pin
 }
-
 `;

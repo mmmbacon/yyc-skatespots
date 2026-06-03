@@ -1,11 +1,15 @@
 import { createContext } from 'react';
 
 const Context = createContext({
-  currentUser: null,
-  isAuth: false,
-  draft: null,
-  pins: [],
-  currentPin: null
-})
+  state: {
+    currentUser: null,
+    idToken: null,
+    isAuth: false,
+    draft: null,
+    pins: [],
+    currentPin: null,
+  },
+  dispatch: () => {},
+});
 
 export default Context;

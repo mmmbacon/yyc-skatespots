@@ -1,31 +1,67 @@
 # skatespot.app
-## [https://skatespot.app](https://geopinr.vercel.app/login)
 
-This app is a tech demonstration using Node.js, React, Apollo GraphQL, MongoDB Atlas and MaterialUI. Authentication is provided by Google Plus API via OAuth2.0. The app serves as a central hub for skaters of all backgrounds to come together to share skate spots and socialize. Future plans include the ability to add multiple photos per pin, maintain ratings for each pin, and allow sharing of spots via social media like instagram.
+A Node.js + React SPA for sharing skate spots on a map. GraphQL API (Apollo Server), MongoDB, Google OAuth, and Mapbox.
 
-Server deploye on Heroku and front end served on Vercel.
+## Prerequisites
 
-## Installation/Running the App:
+- Node.js 18+ (20 LTS recommended)
+- Docker (for local MongoDB)
+- Google OAuth Web client ID
+- Mapbox access token
 
-Clone the repo
+## Local development
 
-Server:
+### 1. Environment
 
-```cd``` into the project folder
+```bash
+cp .env.example .env
+cp client/.env.example client/.env
+```
 
-```npm install```
+Fill in root `.env` (`MONGO_URI`, `OAUTH_CLIENT_ID`, `PORT`) and `client/.env` (`VITE_*` values). `OAUTH_CLIENT_ID` must match `VITE_GOOGLE_CLIENT_ID`.
 
-```npm start dev```
+### 2. MongoDB
 
-Client: 
+```bash
+npm run db:up
+```
 
-```cd``` into /client
+### 3. API server (terminal 1)
 
-```npm install```
+```bash
+npm install
+npm run dev
+```
 
-```npm start```
+GraphQL: http://localhost:4000/graphql
 
-## Screenshots:
+### 4. Client (terminal 2)
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+App: http://localhost:3000
+
+## Scripts
+
+| Location | Command | Description |
+|----------|---------|-------------|
+| root | `npm run db:up` | Start MongoDB container |
+| root | `npm run db:down` | Stop MongoDB container |
+| root | `npm run dev` | API with nodemon |
+| root | `npm test` | Backend tests |
+| client | `npm run dev` | Vite dev server |
+| client | `npm run build` | Production build |
+| client | `npm test` | Client tests |
+
+## Smoke testing
+
+See [docs/SMOKE_CHECKLIST.md](docs/SMOKE_CHECKLIST.md).
+
+## Screenshots
 
 User Experience / Creating a Pin / Commenting:
 ![Splash](https://i.imgur.com/6nZLWJ6.gif)
@@ -33,6 +69,5 @@ User Experience / Creating a Pin / Commenting:
 New Spot Creation / UI:
 ![UI](https://i.imgur.com/8vezS8M.png)
 
-Viewing exisiting spots / Map pop up:
+Viewing existing spots / Map pop up:
 ![View](https://i.imgur.com/C6n21LX.png)
-
