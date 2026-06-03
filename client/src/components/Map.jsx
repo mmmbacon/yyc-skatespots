@@ -293,6 +293,7 @@ const MapView = () => {
 
         {activePin && (
           <Popup
+            className="pin-popup"
             anchor="top"
             latitude={activePin.latitude}
             longitude={activePin.longitude}

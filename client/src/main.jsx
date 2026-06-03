@@ -11,6 +11,7 @@ import { config } from './config';
 import { useAppStore } from './stores/useAppStore';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import './mapPopup.css';
 
 function ApolloApp({ children }) {
   const idToken = useAppStore((state) => state.idToken);
