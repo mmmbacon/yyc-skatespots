@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import Map, { NavigationControl, Marker, Popup } from 'react-map-gl';
+import Map, { NavigationControl, Marker, Popup, useMap } from 'react-map-gl';
 import { styled } from '@mui/material/styles';
 import { useSubscription } from '@apollo/client';
 import { differenceInMinutes } from 'date-fns';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/DeleteTwoTone';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
 
 import PinIcon from './PinIcon';
 import { useClient } from '../client';
@@ -21,11 +24,23 @@ import Blog from './Blog';
 import Context from '../context';
 import { config } from '../config';
 
+// Default center: Calgary (app is yyc-skatespots) until geolocation succeeds
 const INITIAL_VIEWPORT = {
-  latitude: 37.7577,
-  longitude: -122.4376,
-  zoom: 13,
+  latitude: 51.0447,
+  longitude: -114.0719,
+  zoom: 11,
 };
+
+const GEO_OPTIONS = {
+  enableHighAccuracy: true,
+  timeout: 15000,
+  maximumAge: 0,
+};
+
+function readPosition(position) {
+  const { latitude, longitude, accuracy } = position.coords;
+  return { latitude, longitude, accuracy };
+}
 
 const Root = styled('div', {
   shouldForwardProp: (prop) => prop !== 'mobile',
@@ -34,12 +49,53 @@ const Root = styled('div', {
   flexDirection: mobile ? 'column-reverse' : undefined,
 }));
 
-const NavControl = styled('div')({
+const MapControls = styled('div')({
   position: 'absolute',
   top: 0,
   left: 0,
   margin: '1em',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '8px',
+  zIndex: 1,
 });
+
+function LocateMeButton({ onLocated }) {
+  const map = useMap();
+
+  const handleClick = () => {
+    if (!('geolocation' in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = readPosition(position);
+        onLocated(coords);
+        map?.flyTo({
+          center: [coords.longitude, coords.latitude],
+          zoom: Math.max(map.getZoom(), 14),
+          duration: 1200,
+        });
+      },
+      (err) => console.error('Geolocation error', err),
+      GEO_OPTIONS,
+    );
+  };
+
+  return (
+    <Tooltip title="Go to my location (uses GPS when available)">
+      <IconButton
+        onClick={handleClick}
+        aria-label="Go to my location"
+        sx={{
+          bgcolor: 'background.paper',
+          boxShadow: 1,
+          '&:hover': { bgcolor: 'background.paper' },
+        }}
+      >
+        <MyLocationIcon color="primary" />
+      </IconButton>
+    </Tooltip>
+  );
+}
 
 const MapView = () => {
   const mobileSize = useMediaQuery('(max-width: 650px)');
@@ -48,6 +104,7 @@ const MapView = () => {
   const [popup, setPopup] = useState(null);
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT);
   const [userPosition, setUserPosition] = useState(null);
+  const [locationAccuracy, setLocationAccuracy] = useState(null);
 
   useSubscription(PIN_ADDED_SUBSCRIPTION, {
     onData: ({ data }) => {
@@ -91,14 +148,24 @@ const MapView = () => {
     }
   }, [state.pins.length, popup, state.pins]);
 
+  const applyUserPosition = ({ latitude, longitude, accuracy }) => {
+    setUserPosition({ latitude, longitude });
+    if (accuracy != null) setLocationAccuracy(accuracy);
+    setViewport((v) => ({
+      ...v,
+      latitude,
+      longitude,
+      zoom: Math.max(v.zoom, 14),
+    }));
+  };
+
   const getUserPosition = () => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        setViewport((v) => ({ ...v, latitude, longitude }));
-        setUserPosition({ latitude, longitude });
-      });
-    }
+    if (!('geolocation' in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => applyUserPosition(readPosition(position)),
+      (err) => console.error('Geolocation error', err),
+      GEO_OPTIONS,
+    );
   };
 
   const handleMapClick = (evt) => {
@@ -134,16 +201,19 @@ const MapView = () => {
     <Root mobile={mobileSize}>
       <Map
         mapboxAccessToken={config.mapboxToken}
-        initialViewState={viewport}
+        latitude={viewport.latitude}
+        longitude={viewport.longitude}
+        zoom={viewport.zoom}
         onMove={(evt) => setViewport(evt.viewState)}
         onClick={handleMapClick}
         scrollZoom={!mobileSize}
         style={{ width: '100vw', height: 'calc(100vh - 64px)' }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
       >
-        <NavControl>
+        <MapControls>
           <NavigationControl position="top-left" />
-        </NavControl>
+          <LocateMeButton onLocated={applyUserPosition} />
+        </MapControls>
 
         {userPosition && (
           <Marker
@@ -151,7 +221,15 @@ const MapView = () => {
             longitude={userPosition.longitude}
             anchor="bottom"
           >
-            <PinIcon size={40} color="red" />
+            <PinIcon
+              size={40}
+              color="red"
+              title={
+                locationAccuracy != null
+                  ? `You (±${Math.round(locationAccuracy)} m)`
+                  : 'You'
+              }
+            />
           </Marker>
         )}
 

@@ -12,6 +12,7 @@
     "db:up": "docker compose up -d mongodb",
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f mongodb",
+    "db:seed": "node scripts/seed.js",
     "test": "node --test tests/*.test.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

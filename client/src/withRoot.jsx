@@ -17,11 +17,21 @@ const theme = createTheme({
     },
   },
   typography: {
+    htmlFontSize: 12,
+    fontSize: 12,
     h5: {
       fontSize: '2.5em',
       fontFamily: ['Fredoka One'].join(','),
     },
     fontFamily: ['Montserrat'].join(','),
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        html: { fontSize: 12 },
+        body: { fontSize: 12 },
+      },
+    },
   },
 });
 

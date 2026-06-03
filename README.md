@@ -51,6 +51,9 @@ App: http://localhost:3000
 |----------|---------|-------------|
 | root | `npm run db:up` | Start MongoDB container |
 | root | `npm run db:down` | Stop MongoDB container |
+| root | `npm run db:seed` | Seed random Calgary skate spots |
+| root | `npm run db:seed -- --reset` | Clear pins and re-seed |
+| root | `npm run db:seed -- --count=40` | Seed N spots (default 25) |
 | root | `npm run dev` | API with nodemon |
 | root | `npm test` | Backend tests |
 | client | `npm run dev` | Vite dev server |
