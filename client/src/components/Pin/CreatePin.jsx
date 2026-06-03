@@ -164,7 +164,7 @@ const CreatePin = () => {
                 Tap to upload a photo
               </Typography>
               <Typography variant="caption" color="text.disabled" textAlign="center">
-                Optional — a default image is used if you skip
+                Optional. A default image is used if you skip
               </Typography>
             </Box>
           )}

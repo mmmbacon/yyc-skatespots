@@ -12,6 +12,7 @@ import PinIcon from './PinIcon';
 import PinPopover from './Pin/PinPopover';
 import CommentDrawer from './Comment/CommentDrawer';
 import MapToolbar from './Map/MapToolbar';
+import AboutPanel from './Map/AboutPanel';
 import AddPinPopover from './Map/AddPinPopover';
 import { useClient } from '../client';
 import { GET_PINS_QUERY } from '../graphql/queries';
@@ -24,7 +25,7 @@ import {
 import { useAppStore } from '../stores/useAppStore';
 import { config, MAP_AREA_HEIGHT } from '../config';
 
-/** Portfolio default — always start on Calgary; geolocation is opt-in only */
+/** Portfolio default: always start on Calgary; geolocation is opt-in only */
 const INITIAL_VIEWPORT = {
   latitude: 51.0447,
   longitude: -114.0719,
@@ -327,6 +328,7 @@ const MapView = () => {
   return (
     <Root mobile={mobileSize}>
       <MapArea>
+      <AboutPanel />
       <MapToolbar
         placementMode={pinPlacementActive}
         placementDesktop={!mobileSize}
