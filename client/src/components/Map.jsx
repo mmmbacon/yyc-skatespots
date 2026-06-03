@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Map, { NavigationControl, Marker, Popup, useMap } from 'react-map-gl';
 import { styled } from '@mui/material/styles';
@@ -11,6 +11,8 @@ import MyLocationIcon from '@mui/icons-material/MyLocation';
 import PinIcon from './PinIcon';
 import PinPopover from './Pin/PinPopover';
 import CommentDrawer from './Comment/CommentDrawer';
+import MapToolbar from './Map/MapToolbar';
+import AddPinPopover from './Map/AddPinPopover';
 import { useClient } from '../client';
 import { GET_PINS_QUERY } from '../graphql/queries';
 import { DELETE_PIN_MUTATION } from '../graphql/mutations';
@@ -22,7 +24,7 @@ import {
 import { useAppStore } from '../stores/useAppStore';
 import { config, MAP_AREA_HEIGHT } from '../config';
 
-// Default center: Calgary (app is yyc-skatespots) until geolocation succeeds
+/** Portfolio default — always start on Calgary; geolocation is opt-in only */
 const INITIAL_VIEWPORT = {
   latitude: 51.0447,
   longitude: -114.0719,
@@ -40,6 +42,20 @@ function readPosition(position) {
   return { latitude, longitude, accuracy };
 }
 
+function requestUserLocation() {
+  return new Promise((resolve, reject) => {
+    if (!('geolocation' in navigator)) {
+      reject(new Error('Geolocation is not available'));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve(readPosition(position)),
+      reject,
+      GEO_OPTIONS,
+    );
+  });
+}
+
 const Root = styled('div', {
   shouldForwardProp: (prop) => prop !== 'mobile',
 })(({ mobile }) => ({
@@ -49,7 +65,7 @@ const Root = styled('div', {
 
 const MapArea = styled('div')({
   position: 'relative',
-  width: '100vw',
+  width: '100%',
   height: MAP_AREA_HEIGHT,
   overflow: 'hidden',
 });
@@ -115,10 +131,14 @@ const MapView = () => {
   const setPins = useAppStore((state) => state.setPins);
   const createDraft = useAppStore((state) => state.createDraft);
   const updateDraftLocation = useAppStore((state) => state.updateDraftLocation);
+  const deleteDraft = useAppStore((state) => state.deleteDraft);
   const setCurrentPin = useAppStore((state) => state.setCurrentPin);
   const mapRef = useRef(null);
   const [popup, setPopup] = useState(null);
   const [commentDrawerOpen, setCommentDrawerOpen] = useState(false);
+  const [pinPlacementActive, setPinPlacementActive] = useState(false);
+  const [addPinPopoverOpen, setAddPinPopoverOpen] = useState(false);
+  const [isLocatingForPin, setIsLocatingForPin] = useState(false);
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT);
   const [userPosition, setUserPosition] = useState(null);
   const [locationAccuracy, setLocationAccuracy] = useState(null);
@@ -149,7 +169,6 @@ const MapView = () => {
 
   useEffect(() => {
     getPins();
-    getUserPosition();
   }, []);
 
   const getPins = async () => {
@@ -169,40 +188,121 @@ const MapView = () => {
     setCommentDrawerOpen(false);
   }, [popup?._id]);
 
+  useEffect(() => {
+    if (!draft) {
+      setPinPlacementActive(false);
+      setAddPinPopoverOpen(false);
+    }
+  }, [draft]);
+
   const applyUserPosition = ({ latitude, longitude, accuracy }) => {
     setUserPosition({ latitude, longitude });
     if (accuracy != null) setLocationAccuracy(accuracy);
-    setViewport((v) => ({
-      ...v,
-      latitude,
-      longitude,
-      zoom: Math.max(v.zoom, 14),
-    }));
   };
 
-  const getUserPosition = () => {
-    if (!('geolocation' in navigator)) return;
-    navigator.geolocation.getCurrentPosition(
-      (position) => applyUserPosition(readPosition(position)),
-      (err) => console.error('Geolocation error', err),
-      GEO_OPTIONS,
-    );
+  const openCreatePinAt = (coords) => {
+    updateDraftLocation({
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+    });
+    mapRef.current?.flyTo({
+      center: [coords.longitude, coords.latitude],
+      zoom: Math.max(mapRef.current?.getZoom() ?? 14, 14),
+      duration: 1000,
+    });
+    setPinPlacementActive(false);
+    setPopup(null);
+    setAddPinPopoverOpen(true);
   };
 
-  const handleMapClick = (evt) => {
-    if (evt.originalEvent.button !== 0) return;
-    if (!isAuth) return;
-    if (!draft) {
-      createDraft();
+  const handleStartAddPin = () => {
+    setPopup(null);
+    setCommentDrawerOpen(false);
+    setAddPinPopoverOpen(false);
+    setPinPlacementActive(false);
+    createDraft();
+
+    if (mobileSize) {
+      setIsLocatingForPin(true);
+      requestUserLocation()
+        .then((coords) => {
+          applyUserPosition(coords);
+          openCreatePinAt(coords);
+        })
+        .catch((err) => {
+          console.error('Geolocation error', err);
+          if (userPosition) {
+            openCreatePinAt(userPosition);
+            return;
+          }
+          deleteDraft();
+          window.alert(
+            'Location access is needed to add a spot where you are. Enable location for this site and try again.',
+          );
+        })
+        .finally(() => setIsLocatingForPin(false));
+      return;
     }
-    const { lng: longitude, lat: latitude } = evt.lngLat;
-    updateDraftLocation({ longitude, latitude });
+
+    const center = mapRef.current?.getCenter();
+    updateDraftLocation({
+      latitude: center?.lat ?? viewport.latitude,
+      longitude: center?.lng ?? viewport.longitude,
+    });
+    setPinPlacementActive(true);
+  };
+
+  const handlePlacementMouseMove = useCallback(
+    (event) => {
+      if (!pinPlacementActive || mobileSize) return;
+      updateDraftLocation({
+        latitude: event.lngLat.lat,
+        longitude: event.lngLat.lng,
+      });
+    },
+    [pinPlacementActive, mobileSize, updateDraftLocation],
+  );
+
+  const handleConfirmPlacement = () => {
+    setPinPlacementActive(false);
+    setPopup(null);
+    setAddPinPopoverOpen(true);
+  };
+
+  const handleCancelAddPin = () => {
+    deleteDraft();
+    setPinPlacementActive(false);
+    setAddPinPopoverOpen(false);
+    setIsLocatingForPin(false);
+  };
+
+  useEffect(() => {
+    if (!draft) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      handleCancelAddPin();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [draft]);
+
+  const handlePlacementMapClick = (event) => {
+    if (!pinPlacementActive || mobileSize) return;
+    updateDraftLocation({
+      latitude: event.lngLat.lat,
+      longitude: event.lngLat.lng,
+    });
+    handleConfirmPlacement();
   };
 
   const isNewPin = (pin) =>
     differenceInMinutes(Date.now(), Number(pin.createdAt)) <= 30;
 
   const handleSelectPin = (pin) => {
+    if (pinPlacementActive) return;
     setPopup(pin);
     setCurrentPin(pin);
     mapRef.current?.flyTo({
@@ -227,6 +327,14 @@ const MapView = () => {
   return (
     <Root mobile={mobileSize}>
       <MapArea>
+      <MapToolbar
+        placementMode={pinPlacementActive}
+        placementDesktop={!mobileSize}
+        isLocatingForPin={isLocatingForPin}
+        onAddPin={handleStartAddPin}
+        onCancelAdd={handleCancelAddPin}
+        onConfirmPlacement={handleConfirmPlacement}
+      />
       <Map
         ref={mapRef}
         mapboxAccessToken={config.mapboxToken}
@@ -234,7 +342,15 @@ const MapView = () => {
         longitude={viewport.longitude}
         zoom={viewport.zoom}
         onMove={(evt) => setViewport(evt.viewState)}
-        onClick={handleMapClick}
+        onMouseMove={handlePlacementMouseMove}
+        onClick={handlePlacementMapClick}
+        cursor={
+          pinPlacementActive && !mobileSize
+            ? 'none'
+            : pinPlacementActive
+              ? 'crosshair'
+              : undefined
+        }
         scrollZoom={!mobileSize}
         style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
@@ -262,13 +378,16 @@ const MapView = () => {
           </Marker>
         )}
 
-        {draft && (
+        {draft && (pinPlacementActive || addPinPopoverOpen) && (
           <Marker
             latitude={draft.latitude}
             longitude={draft.longitude}
             anchor="bottom"
+            style={
+              pinPlacementActive ? { pointerEvents: 'none' } : undefined
+            }
           >
-            <PinIcon size={40} color="hotpink" />
+            <PinIcon size={48} color="hotpink" draggable={pinPlacementActive} />
           </Marker>
         )}
 
@@ -291,7 +410,21 @@ const MapView = () => {
           </Marker>
         ))}
 
-        {activePin && (
+        {draft && addPinPopoverOpen && (
+          <Popup
+            className="pin-popup create-pin-popup"
+            anchor="top"
+            latitude={draft.latitude}
+            longitude={draft.longitude}
+            closeOnClick={false}
+            maxWidth="360"
+            onClose={handleCancelAddPin}
+          >
+            <AddPinPopover />
+          </Popup>
+        )}
+
+        {activePin && !addPinPopoverOpen && (
           <Popup
             className="pin-popup"
             anchor="top"

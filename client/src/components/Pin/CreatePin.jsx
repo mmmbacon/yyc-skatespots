@@ -1,36 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import {
   TextField,
   Typography,
   Button,
   Box,
-  useMediaQuery,
+  Stack,
+  Divider,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import AddAPhotoIcon from '@mui/icons-material/AddAPhotoTwoTone';
+import AddAPhotoIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import ClearIcon from '@mui/icons-material/Clear';
-import SaveIcon from '@mui/icons-material/SaveTwoTone';
+import SaveIcon from '@mui/icons-material/Save';
 
 import { useAppStore } from '../../stores/useAppStore';
 import { CREATE_PIN_MUTATION } from '../../graphql/mutations';
 import { useClient } from '../../client';
-import { config, DEFAULT_PIN_IMAGE } from '../../config';
-
-const Form = styled('form')(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  flexDirection: 'column',
-  paddingBottom: theme.spacing(1),
-}));
+import { config } from '../../config';
 
 const HiddenInput = styled('input')({
   display: 'none',
 });
 
 const CreatePin = () => {
-  const mobileSize = useMediaQuery('(max-width:650px)');
+  const mobileSize = useMediaQuery('(max-width: 650px)');
   const client = useClient();
   const draft = useAppStore((state) => state.draft);
   const deleteDraft = useAppStore((state) => state.deleteDraft);
@@ -39,27 +33,32 @@ const CreatePin = () => {
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const handleDeleteDraft = () => {
+  const resetForm = () => {
     setTitle('');
     setImage(null);
     setContent('');
+  };
+
+  const handleDiscard = () => {
+    resetForm();
     deleteDraft();
   };
 
   const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!title.trim() || !content.trim() || !draft || submitting) return;
+
+    setSubmitting(true);
     try {
-      event.preventDefault();
-      setSubmitting(true);
-      const url = image ? await handleImageUpload() : config.defaultPinImage;
-      const { latitude, longitude } = draft;
+      const imageUrl = image ? await uploadImage() : config.defaultPinImage;
       await client.request(CREATE_PIN_MUTATION, {
-        title,
-        image: url,
-        content,
-        latitude,
-        longitude,
+        title: title.trim(),
+        image: imageUrl,
+        content: content.trim(),
+        latitude: draft.latitude,
+        longitude: draft.longitude,
       });
-      handleDeleteDraft();
+      handleDiscard();
     } catch (err) {
       console.error('Error creating pin', err);
     } finally {
@@ -67,7 +66,7 @@ const CreatePin = () => {
     }
   };
 
-  const handleImageUpload = async () => {
+  const uploadImage = async () => {
     const data = new FormData();
     data.append('file', image);
     data.append('upload_preset', 'geopinr');
@@ -79,68 +78,166 @@ const CreatePin = () => {
     return res.data.url;
   };
 
+  const previewUrl = useMemo(
+    () => (image ? URL.createObjectURL(image) : null),
+    [image],
+  );
+
+  useEffect(() => {
+    if (!previewUrl) return undefined;
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
+
   return (
-    <Form onSubmit={handleSubmit}>
-      <Box ml={1.5}>
-        {image ? (
-          <img src={URL.createObjectURL(image)} alt="preview" width="100%" />
-        ) : (
-          <Box p={1}>
-            <img src={DEFAULT_PIN_IMAGE} alt="Default spot preview" width="100%" />
-          </Box>
-        )}
-      </Box>
-      <Typography variant="h6" color="primary" align="center">
-        Post a new skate spot
-      </Typography>
-      <Box p={1}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{ width: '100%', boxSizing: 'border-box' }}
+    >
+      <Stack spacing={mobileSize ? 2.5 : 1.5}>
+        {draft && mobileSize ? (
+          <Typography variant="caption" color="text.secondary">
+            At your current location
+          </Typography>
+        ) : null}
+
+        <Box sx={{ width: '100%' }}>
+          <Typography variant="subtitle2" gutterBottom>
+            Photo
+          </Typography>
+          <HiddenInput
+            accept="image/*"
+            id="add-pin-image"
+            type="file"
+            onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+          />
+          {previewUrl ? (
+            <Box
+              sx={{
+                width: '100%',
+                borderRadius: 2,
+                overflow: 'hidden',
+                border: 1,
+                borderColor: 'divider',
+              }}
+            >
+              <Box
+                component="img"
+                src={previewUrl}
+                alt="Spot photo preview"
+                sx={{
+                  width: '100%',
+                  height: mobileSize ? 200 : 112,
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
+            </Box>
+          ) : (
+            <Box
+              component="label"
+              htmlFor="add-pin-image"
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 1,
+                width: '100%',
+                minHeight: mobileSize ? 140 : 88,
+                px: 2,
+                py: mobileSize ? 3 : 2,
+                borderRadius: 2,
+                border: '2px dashed',
+                borderColor: 'divider',
+                bgcolor: 'action.hover',
+                cursor: 'pointer',
+                boxSizing: 'border-box',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  bgcolor: 'action.selected',
+                },
+              }}
+            >
+              <AddAPhotoIcon sx={{ fontSize: 40, color: 'text.secondary' }} />
+              <Typography variant="body2" color="text.secondary" textAlign="center">
+                Tap to upload a photo
+              </Typography>
+              <Typography variant="caption" color="text.disabled" textAlign="center">
+                Optional — a default image is used if you skip
+              </Typography>
+            </Box>
+          )}
+          <Stack direction="row" spacing={1} sx={{ mt: 1.5, width: '100%' }}>
+            <Button
+              component="label"
+              htmlFor="add-pin-image"
+              variant="outlined"
+              fullWidth
+              startIcon={<AddAPhotoIcon />}
+            >
+              {previewUrl ? 'Change photo' : 'Choose photo'}
+            </Button>
+            {previewUrl ? (
+              <Button
+                type="button"
+                variant="text"
+                color="inherit"
+                onClick={() => setImage(null)}
+              >
+                Remove
+              </Button>
+            ) : null}
+          </Stack>
+        </Box>
+
         <TextField
-          name="title"
-          label="title"
-          placeholder="Skate Spot Title"
-          fullWidth
+          label="Spot name"
+          placeholder="e.g. Shaw Millennium Park"
+          value={title}
           onChange={(e) => setTitle(e.target.value)}
-        />
-        <HiddenInput
-          accept="image/*"
-          id="image"
-          type="file"
-          onChange={(e) => setImage(e.target.files[0])}
-        />
-        <label htmlFor="image">
-          <Button component="span" size="small" sx={{ color: image ? 'green' : undefined }}>
-            <AddAPhotoIcon />
-          </Button>
-        </label>
-      </Box>
-      <Box sx={{ mx: 1, width: '95%' }}>
-        <TextField
-          name="content"
-          label="Spot Description and Notes"
-          multiline
-          rows={mobileSize ? 3 : 6}
-          margin="normal"
           fullWidth
-          variant="outlined"
-          onChange={(e) => setContent(e.target.value)}
+          required
+          autoComplete="off"
         />
-      </Box>
-      <Box>
-        <Button variant="contained" color="primary" onClick={handleDeleteDraft}>
-          <ClearIcon sx={{ mr: 1 }} />
-          Discard
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          disabled={!title.trim() || !content.trim() || submitting}
-          onClick={handleSubmit}
-        >
-          <SaveIcon sx={{ ml: 1 }} />
-          Submit
-        </Button>
-      </Box>
-    </Form>
+
+        <TextField
+          label="Description"
+          placeholder="What’s good here? Surface, bust factor, best time to go…"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          fullWidth
+          required
+          multiline
+          minRows={mobileSize ? 4 : 2}
+          maxRows={mobileSize ? 8 : 3}
+        />
+
+        <Divider />
+
+        <Stack direction="row" spacing={1.5} justifyContent="flex-end">
+          <Button
+            type="button"
+            variant="outlined"
+            color="inherit"
+            onClick={handleDiscard}
+            disabled={submitting}
+            startIcon={<ClearIcon />}
+          >
+            Discard
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={!title.trim() || !content.trim() || submitting}
+            startIcon={<SaveIcon />}
+          >
+            {submitting ? 'Posting…' : 'Post spot'}
+          </Button>
+        </Stack>
+      </Stack>
+    </Box>
   );
 };
 

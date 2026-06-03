@@ -14,3 +14,17 @@
   line-height: 30px;
   padding: 0;
 }
+
+@media (min-width: 651px) {
+  .create-pin-popup .mapboxgl-popup-content {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 650px) {
+  .create-pin-popup .mapboxgl-popup-content {
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+  }
+}
