@@ -1,6 +1,7 @@
 const { GraphQLError } = require('graphql');
 const { PubSub } = require('graphql-subscriptions');
 const Pin = require('./models/Pin');
+const { signUp, signIn, toPublicUser } = require('./controllers/userController');
 
 const pubsub = new PubSub();
 const PIN_ADDED = 'PIN_ADDED';
@@ -18,7 +19,7 @@ const authenticated = (next) => (root, args, ctx, info) => {
 
 module.exports = {
   Query: {
-    me: authenticated((root, args, ctx) => ctx.currentUser),
+    me: authenticated((root, args, ctx) => toPublicUser(ctx.currentUser)),
     getPins: async () => {
       const pins = await Pin.find({})
         .populate('author')
@@ -27,6 +28,8 @@ module.exports = {
     },
   },
   Mutation: {
+    signUp: (_, args) => signUp(args),
+    signIn: (_, args) => signIn(args),
     createPin: authenticated(async (root, args, ctx) => {
       const newPin = await new Pin({
         ...args.input,

@@ -18,7 +18,9 @@ cp .env.example .env
 cp client/.env.example client/.env
 ```
 
-Fill in root `.env` (`MONGO_URI`, `OAUTH_CLIENT_ID`, `PORT`) and `client/.env` (`VITE_*` values). `OAUTH_CLIENT_ID` must match `VITE_GOOGLE_CLIENT_ID`.
+Fill in root `.env` (`MONGO_URI`, `OAUTH_CLIENT_ID`, `JWT_SECRET`, `PORT`) and `client/.env` (`VITE_*` values). `OAUTH_CLIENT_ID` must match `VITE_GOOGLE_CLIENT_ID`.
+
+Sign in with **username or email** plus password, or **Google**. Sign up requires **username, email, and password** (8+ characters).
 
 ### 2. MongoDB
 

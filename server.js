@@ -14,7 +14,7 @@ const { useServer } = require('graphql-ws/lib/use/ws');
 
 const typeDefs = require('./typeDefs');
 const resolvers = require('./resolvers');
-const { findOrCreateUser } = require('./controllers/userController');
+const { authenticateFromToken } = require('./controllers/userController');
 
 const PORT = process.env.PORT || 4000;
 
@@ -61,7 +61,7 @@ async function start() {
         try {
           const authToken = req.headers.authorization;
           if (authToken) {
-            currentUser = await findOrCreateUser(authToken);
+            currentUser = await authenticateFromToken(authToken);
           }
         } catch (err) {
           console.error('Unable to authenticate user', err);

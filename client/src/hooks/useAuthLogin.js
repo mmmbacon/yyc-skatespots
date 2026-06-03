@@ -3,6 +3,7 @@ import { GraphQLClient } from 'graphql-request';
 import Context from '../context';
 import { ME_QUERY } from '../graphql/queries';
 import { config } from '../config';
+import { applyAuthSession } from '../utils/authSession';
 
 export function useAuthLogin() {
   const { dispatch } = useContext(Context);
@@ -14,9 +15,7 @@ export function useAuthLogin() {
         headers: { authorization: idToken },
       });
       const { me } = await client.request(ME_QUERY);
-      dispatch({ type: 'SET_ID_TOKEN', payload: idToken });
-      dispatch({ type: 'LOGIN_USER', payload: me });
-      dispatch({ type: 'IS_LOGGED_IN', payload: true });
+      applyAuthSession(dispatch, { token: idToken, user: me });
     } catch (err) {
       onFailure(err);
     }

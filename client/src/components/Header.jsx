@@ -8,18 +8,12 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Context from '../context';
-import Signout from './Auth/Signout';
-import GoogleSignInButton from './Auth/GoogleSignInButton';
+import UserMenu from './Auth/UserMenu';
+import HeaderAuth from './Auth/HeaderAuth';
 
 const Logo = styled('img')({
   height: '2.5em',
 });
-
-const UserPicture = styled('img')(({ theme }) => ({
-  height: '35px',
-  borderRadius: '90%',
-  marginRight: theme.spacing(2),
-}));
 
 const Header = () => {
   const mobileSize = useMediaQuery('(max-width:650px)');
@@ -63,24 +57,9 @@ const Header = () => {
             </Typography>
           </Box>
           {isAuth && currentUser ? (
-            <Box display="flex" flexDirection="row" alignItems="center">
-              <Box mr={1}>
-                <Signout />
-              </Box>
-              <Box mr={1}>
-                <Typography
-                  variant="h6"
-                  color="inherit"
-                  noWrap
-                  sx={{ display: mobileSize ? 'none' : 'block' }}
-                >
-                  {currentUser.name}
-                </Typography>
-              </Box>
-              <UserPicture src={currentUser.picture} alt="Pic" />
-            </Box>
+            <UserMenu mobileSize={mobileSize} />
           ) : (
-            <GoogleSignInButton />
+            <HeaderAuth />
           )}
         </Box>
       </Toolbar>

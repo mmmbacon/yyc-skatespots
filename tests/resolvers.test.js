@@ -12,8 +12,10 @@ describe('resolvers authentication', () => {
   });
 
   it('me returns current user when authenticated', async () => {
-    const user = { _id: '1', name: 'Test' };
+    const user = { _id: '1', name: 'Test', email: 'test@example.com' };
     const result = await resolvers.Query.me(null, {}, { currentUser: user });
-    assert.deepStrictEqual(result, user);
+    assert.strictEqual(result._id, '1');
+    assert.strictEqual(result.name, 'Test');
+    assert.strictEqual(result.picture, '/default_image.png');
   });
 });

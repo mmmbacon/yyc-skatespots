@@ -3,9 +3,15 @@ const { gql } = require('graphql-tag');
 module.exports = gql`
 type User {
   _id: ID
+  username: String
   name: String
   email: String
   picture: String
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
 }
 
 type Pin {
@@ -40,6 +46,8 @@ type Query {
 }
 
 type Mutation {
+  signUp(username: String!, email: String!, password: String!): AuthPayload!
+  signIn(login: String!, password: String!): AuthPayload!
   createPin(input: CreatePinInput!): Pin
   deletePin(pinId: ID!): Pin
   createComment(pinId: ID!, text: String!): Pin
