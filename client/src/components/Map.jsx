@@ -22,7 +22,7 @@ import {
 } from '../graphql/subscriptions';
 import Blog from './Blog';
 import Context from '../context';
-import { config } from '../config';
+import { config, pinImageSrc } from '../config';
 
 // Default center: Calgary (app is yyc-skatespots) until geolocation succeeds
 const INITIAL_VIEWPORT = {
@@ -274,7 +274,7 @@ const MapView = () => {
                 width: 200,
                 objectFit: 'cover',
               }}
-              src={popup.image}
+              src={pinImageSrc(popup.image)}
               alt={popup.title}
             />
             <div

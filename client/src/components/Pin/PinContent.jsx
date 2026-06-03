@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import CreateComment from '../Comment/CreateComment';
 import Comments from '../Comment/Comments';
 import Context from '../../context';
+import { pinImageSrc } from '../../config';
 
 const Root = styled(Box)(({ theme }) => ({
   padding: '1em 0.5em',
@@ -39,7 +40,7 @@ const PinContent = () => {
   return (
     <Root display="flex" flexDirection="column" alignItems="center">
       <Box ml={1.5}>
-        <img src={image} alt={content} width="100%" />
+        <img src={pinImageSrc(image)} alt={content} width="100%" />
       </Box>
       <Typography component="h2" variant="h4" color="primary" gutterBottom>
         {title}

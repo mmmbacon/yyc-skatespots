@@ -15,6 +15,7 @@ import SaveIcon from '@mui/icons-material/SaveTwoTone';
 import Context from '../../context';
 import { CREATE_PIN_MUTATION } from '../../graphql/mutations';
 import { useClient } from '../../client';
+import { config, DEFAULT_PIN_IMAGE } from '../../config';
 
 const Form = styled('form')(({ theme }) => ({
   display: 'flex',
@@ -48,7 +49,7 @@ const CreatePin = () => {
     try {
       event.preventDefault();
       setSubmitting(true);
-      const url = await handleImageUpload();
+      const url = image ? await handleImageUpload() : config.defaultPinImage;
       const { latitude, longitude } = state.draft;
       await client.request(CREATE_PIN_MUTATION, {
         title,
@@ -84,11 +85,7 @@ const CreatePin = () => {
           <img src={URL.createObjectURL(image)} alt="preview" width="100%" />
         ) : (
           <Box p={1}>
-            <img
-              src="https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-skateboard-100_ts7wrr.png"
-              alt="preview"
-              width="100%"
-            />
+            <img src={DEFAULT_PIN_IMAGE} alt="Default spot preview" width="100%" />
           </Box>
         )}
       </Box>
@@ -135,7 +132,7 @@ const CreatePin = () => {
         <Button
           variant="contained"
           color="secondary"
-          disabled={!title.trim() || !content.trim() || !image || submitting}
+          disabled={!title.trim() || !content.trim() || submitting}
           onClick={handleSubmit}
         >
           <SaveIcon sx={{ ml: 1 }} />

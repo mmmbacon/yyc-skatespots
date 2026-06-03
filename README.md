@@ -54,6 +54,7 @@ App: http://localhost:3000
 | root | `npm run db:seed` | Seed random Calgary skate spots |
 | root | `npm run db:seed -- --reset` | Clear pins and re-seed |
 | root | `npm run db:seed -- --count=40` | Seed N spots (default 25) |
+| root | `npm run db:seed -- --fix-images` | Update all pins to default image |
 | root | `npm run dev` | API with nodemon |
 | root | `npm test` | Backend tests |
 | client | `npm run dev` | Vite dev server |

@@ -6,6 +6,7 @@
  *   npm run db:seed              # add pins (keeps existing data)
  *   npm run db:seed -- --reset   # delete all pins, then seed
  *   npm run db:seed -- --count=40
+ *   npm run db:seed -- --fix-images   # set all pins to the default image
  */
 require('dotenv').config();
 
@@ -66,12 +67,8 @@ const SPOT_NOTES = [
   'Legendary YYC spot. Share the space.',
 ];
 
-const PLACEHOLDER_IMAGES = [
-  'https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-skateboard-100_ts7wrr.png',
-  'https://images.unsplash.com/photo-1547448415-9d5d7f710677?w=800&q=80',
-  'https://images.unsplash.com/photo-1572776685900-2a9759ecadf1?w=800&q=80',
-  'https://images.unsplash.com/photo-1564982752979-5062f3707c6b?w=800&q=80',
-];
+// Same path as client/public/default_image.png (resolved by the Vite app origin)
+const DEFAULT_PIN_IMAGE = '/default_image.png';
 
 const SEED_USER = {
   name: 'YYC Skatespots',
@@ -82,9 +79,10 @@ const SEED_USER = {
 
 function parseArgs(argv) {
   const reset = argv.includes('--reset');
+  const fixImages = argv.includes('--fix-images');
   const countArg = argv.find((a) => a.startsWith('--count='));
   const count = countArg ? Math.min(100, Math.max(1, parseInt(countArg.split('=')[1], 10))) : 25;
-  return { reset, count };
+  return { reset, fixImages, count };
 }
 
 function randomInRange(min, max) {
@@ -111,7 +109,7 @@ function buildPin(authorId, index) {
   return {
     title: `${baseTitle} #${index + 1}`,
     content: pick(SPOT_NOTES),
-    image: pick(PLACEHOLDER_IMAGES),
+    image: DEFAULT_PIN_IMAGE,
     latitude,
     longitude,
     author: authorId,
@@ -133,7 +131,7 @@ async function ensureSeedUser() {
 }
 
 async function seed() {
-  const { reset, count } = parseArgs(process.argv.slice(2));
+  const { reset, fixImages, count } = parseArgs(process.argv.slice(2));
 
   if (!process.env.MONGO_URI) {
     console.error('MONGO_URI is not set. Copy .env.example to .env first.');
@@ -142,6 +140,13 @@ async function seed() {
 
   await mongoose.connect(process.env.MONGO_URI);
   console.log('Connected to MongoDB');
+
+  if (fixImages) {
+    const updated = await Pin.updateMany({}, { $set: { image: DEFAULT_PIN_IMAGE } });
+    console.log(`Set default image on ${updated.modifiedCount} pin(s)`);
+    await mongoose.disconnect();
+    return;
+  }
 
   if (reset) {
     const deleted = await Pin.deleteMany({});
