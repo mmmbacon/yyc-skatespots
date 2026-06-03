@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon --ignore client/ server.js"
+    "dev": "nodemon --ignore client/ server.js",
+    "db:up": "docker compose up -d mongodb",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f mongodb"
   },
   "keywords": [],
   "author": "",
