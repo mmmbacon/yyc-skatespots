@@ -31,7 +31,7 @@ const NoContent = () => {
         gutterBottom
         sx={{ fontSize: mobileSize ? '1em' : undefined }}
       >
-        Click on a pin to see its content or click on the map to add a new pin
+        Click a pin to view details. Sign in to add spots on the map.
       </Typography>
     </Root>
   );

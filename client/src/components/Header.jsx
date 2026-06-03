@@ -9,6 +9,7 @@ import {
 import { styled } from '@mui/material/styles';
 import Context from '../context';
 import Signout from './Auth/Signout';
+import GoogleSignInButton from './Auth/GoogleSignInButton';
 
 const Logo = styled('img')({
   height: '2.5em',
@@ -23,7 +24,7 @@ const UserPicture = styled('img')(({ theme }) => ({
 const Header = () => {
   const mobileSize = useMediaQuery('(max-width:650px)');
   const { state } = useContext(Context);
-  const { currentUser } = state;
+  const { currentUser, isAuth } = state;
 
   return (
     <AppBar position="static">
@@ -61,7 +62,7 @@ const Header = () => {
               skatespot.app
             </Typography>
           </Box>
-          {currentUser && (
+          {isAuth && currentUser ? (
             <Box display="flex" flexDirection="row" alignItems="center">
               <Box mr={1}>
                 <Signout />
@@ -78,6 +79,8 @@ const Header = () => {
               </Box>
               <UserPicture src={currentUser.picture} alt="Pic" />
             </Box>
+          ) : (
+            <GoogleSignInButton />
           )}
         </Box>
       </Toolbar>

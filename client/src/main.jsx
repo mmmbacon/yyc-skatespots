@@ -5,8 +5,6 @@ import { ApolloProvider } from '@apollo/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import App from './pages/App.jsx';
-import Splash from './pages/Splash.jsx';
-import ProtectedRoute from './ProtectedRoute.jsx';
 import Context from './context';
 import reducer from './reducer';
 import { createApolloClient } from './apolloClient';
@@ -36,15 +34,7 @@ function Root() {
         <Context.Provider value={{ state, dispatch }}>
           <BrowserRouter>
             <Routes>
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <App />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/login" element={<Splash />} />
+              <Route path="/" element={<App />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>

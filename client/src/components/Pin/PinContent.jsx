@@ -34,6 +34,7 @@ const TextRow = styled(Box)(({ theme }) => ({
 const PinContent = () => {
   const { state } = useContext(Context);
   const { title, image, content, author, createdAt, comments } = state.currentPin;
+  const { isAuth } = state;
 
   return (
     <Root display="flex" flexDirection="column" alignItems="center">
@@ -58,7 +59,13 @@ const PinContent = () => {
       <Typography variant="subtitle1" gutterBottom>
         {content}
       </Typography>
-      <CreateComment />
+      {isAuth ? (
+        <CreateComment />
+      ) : (
+        <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
+          Sign in to add a comment.
+        </Typography>
+      )}
       <Comments comments={comments} />
     </Root>
   );

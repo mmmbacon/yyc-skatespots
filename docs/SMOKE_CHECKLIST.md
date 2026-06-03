@@ -5,12 +5,12 @@ Run after each modernization phase. Requires MongoDB (`npm run db:up`), backend 
 ## Startup
 
 - [ ] Backend logs `DB Connected!` and `Server ready at http://localhost:4000/graphql`
-- [ ] Client opens at http://localhost:3000 without build errors
+- [ ] Client opens at http://localhost:3000 and loads the map without build errors
 
 ## Auth
 
-- [ ] `/login` shows splash and Google sign-in
-- [ ] Successful login redirects to `/` and shows user name/avatar in header
+- [ ] App loads map at `/` without requiring sign-in
+- [ ] Header shows Google sign-in when logged out; successful login shows user name/avatar
 - [ ] Sign out returns to logged-out state
 
 ## Pins (HTTP)

@@ -103,6 +103,7 @@ const MapView = () => {
 
   const handleMapClick = (evt) => {
     if (evt.originalEvent.button !== 0) return;
+    if (!state.isAuth) return;
     if (!state.draft) {
       dispatch({ type: 'CREATE_DRAFT' });
     }
