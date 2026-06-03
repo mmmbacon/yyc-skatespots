@@ -6,11 +6,25 @@
   border-radius: 8px;
 }
 
-/* Mapbox default is 20×20px / 18px type — scale up 50% */
+/* Mapbox default is 20×20px / 18px type; scale up 50% */
 .pin-popup .mapboxgl-popup-close-button {
   width: 30px;
   height: 30px;
   font-size: 27px;
   line-height: 30px;
   padding: 0;
+}
+
+@media (min-width: 651px) {
+  .create-pin-popup .mapboxgl-popup-content {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 650px) {
+  .create-pin-popup .mapboxgl-popup-content {
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+  }
 }

@@ -1,4 +1,4 @@
-/** AppBar + Toolbar height — keep in sync with map layout */
+/** AppBar + Toolbar height; keep in sync with map layout */
 export const HEADER_HEIGHT = 64;
 export const MAP_AREA_HEIGHT = `calc(100vh - ${HEADER_HEIGHT}px)`;
 

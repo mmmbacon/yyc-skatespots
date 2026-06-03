@@ -24,13 +24,15 @@ function resolvePinColor({ color, isNewPin, theme }) {
   return theme.palette.primary.main;
 }
 
-export default function PinIcon({ size, title, color, isNewPin, onClick }) {
+export default function PinIcon({ size, title, color, isNewPin, onClick, draggable }) {
   const theme = useTheme();
   const pinColor = resolvePinColor({ color, isNewPin, theme });
 
   const tooltipTitle = color
     ? color === 'hotpink'
-      ? 'New Spot'
+      ? draggable
+        ? 'Drag to move, click to place'
+        : 'New spot'
       : 'My Location'
     : title;
 
@@ -46,7 +48,7 @@ export default function PinIcon({ size, title, color, isNewPin, onClick }) {
         sx={{
           fontSize: size,
           color: pinColor,
-          cursor: onClick ? 'pointer' : 'default',
+          cursor: draggable ? 'grab' : onClick ? 'pointer' : 'default',
         }}
       />
     </StyledTooltip>
