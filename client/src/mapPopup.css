@@ -1,0 +1,16 @@
+/* Pin detail popovers on the map */
+.pin-popup .mapboxgl-popup-content {
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.22),
+    0 4px 12px rgba(0, 0, 0, 0.14);
+  border-radius: 8px;
+}
+
+/* Mapbox default is 20×20px / 18px type — scale up 50% */
+.pin-popup .mapboxgl-popup-close-button {
+  width: 30px;
+  height: 30px;
+  font-size: 27px;
+  line-height: 30px;
+  padding: 0;
+}

@@ -16,6 +16,6 @@ describe('resolvers authentication', () => {
     const result = await resolvers.Query.me(null, {}, { currentUser: user });
     assert.strictEqual(result._id, '1');
     assert.strictEqual(result.name, 'Test');
-    assert.strictEqual(result.picture, '/default_image.png');
+    assert.strictEqual(result.picture, '/default_avatar.png');
   });
 });

@@ -28,6 +28,21 @@ export const SIGN_IN_MUTATION = `
   }
 `;
 
+export const GOOGLE_SIGN_IN_MUTATION = `
+  mutation($idToken: String!) {
+    googleSignIn(idToken: $idToken) {
+      token
+      user {
+        _id
+        username
+        name
+        email
+        picture
+      }
+    }
+  }
+`;
+
 export const CREATE_PIN_MUTATION = `
   mutation($title: String!, $image: String!, $content: String!, $latitude: Float!, $longitude: Float!){
     createPin(input: {

@@ -8,10 +8,23 @@ const User = require('../models/User');
 const googleClient = new OAuth2Client(process.env.OAUTH_CLIENT_ID);
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-only-change-in-production';
 const JWT_EXPIRES_IN = '7d';
-const DEFAULT_AVATAR = '/default_image.png';
+const DEFAULT_AVATAR = '/default_avatar.png';
+const LEGACY_PIN_IMAGE = '/default_image.png';
+const LEGACY_SEED_AVATAR =
+  'https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-skateboard-50_hpu6mg.png';
 const BCRYPT_ROUNDS = 10;
 
 const normalizeUsername = (username) => username.trim().toLowerCase();
+
+exports.normalizePicture = (picture) => {
+  if (!picture || picture === LEGACY_PIN_IMAGE || picture === LEGACY_SEED_AVATAR) {
+    return DEFAULT_AVATAR;
+  }
+  if (typeof picture === 'string' && picture.includes('icons8-skateboard')) {
+    return DEFAULT_AVATAR;
+  }
+  return picture;
+};
 
 const isValidUsername = (username) => /^[a-z0-9_]{3,30}$/.test(username);
 
@@ -24,7 +37,7 @@ exports.toPublicUser = (user) => {
     username: doc.username,
     name: displayName,
     email: doc.email,
-    picture: doc.picture || DEFAULT_AVATAR,
+    picture: exports.normalizePicture(doc.picture),
   };
 };
 
@@ -182,5 +195,16 @@ exports.signIn = async ({ login, password }) => {
     });
   }
 
+  return authPayload(user);
+};
+
+exports.googleSignIn = async ({ idToken }) => {
+  const googleUser = await verifyGoogleToken(idToken);
+  if (!googleUser) {
+    throw new GraphQLError('Invalid Google sign-in', {
+      extensions: { code: 'UNAUTHENTICATED' },
+    });
+  }
+  const user = await findOrCreateGoogleUser(googleUser);
   return authPayload(user);
 };

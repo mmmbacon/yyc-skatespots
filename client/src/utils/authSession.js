@@ -1,5 +1,12 @@
-export function applyAuthSession(dispatch, { token, user }) {
-  dispatch({ type: 'SET_ID_TOKEN', payload: token });
-  dispatch({ type: 'LOGIN_USER', payload: user });
-  dispatch({ type: 'IS_LOGGED_IN', payload: true });
+import { setStoredToken, clearStoredToken } from './authStorage';
+import { useAppStore } from '../stores/useAppStore';
+
+export function applyAuthSession({ token, user }) {
+  setStoredToken(token);
+  useAppStore.getState().setAuthSession({ token, user });
+}
+
+export function signOutUser() {
+  clearStoredToken();
+  useAppStore.getState().signOut();
 }

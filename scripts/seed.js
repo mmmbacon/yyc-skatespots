@@ -69,12 +69,12 @@ const SPOT_NOTES = [
 
 // Same path as client/public/default_image.png (resolved by the Vite app origin)
 const DEFAULT_PIN_IMAGE = '/default_image.png';
+const DEFAULT_AVATAR = '/default_avatar.png';
 
 const SEED_USER = {
   name: 'YYC Skatespots',
   email: 'seed@skatespot.local',
-  picture:
-    'https://res.cloudinary.com/mmmbacon/image/upload/v1626840695/cdn/icons8-skateboard-50_hpu6mg.png',
+  picture: DEFAULT_AVATAR,
 };
 
 function parseArgs(argv) {

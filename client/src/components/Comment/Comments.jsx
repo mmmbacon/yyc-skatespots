@@ -4,48 +4,45 @@ import {
   Box,
   List,
   ListItem,
-  ListItemText,
-  ListItemAvatar,
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { formatDistanceToNow } from 'date-fns';
 
-const StyledList = styled(List)(({ theme }) => ({
+import { avatarSrc } from '../../config';
+
+const StyledList = styled(List)({
   width: '100%',
-  backgroundColor: theme.palette.background.paper,
-}));
+  padding: 0,
+});
 
 const Comments = ({ comments }) => {
   return (
-    <StyledList>
+    <StyledList dense disablePadding>
       {comments.map((comment, index) => (
-        <ListItem key={index} alignItems="flex-start">
-          <Box display="flex" flexDirection="row" alignItems="center">
-            <ListItemAvatar sx={{ p: 0, m: 0 }}>
-              <Avatar
-                src={comment.author.picture}
-                alt={comment.author.name}
-              />
-            </ListItemAvatar>
-            <ListItemText
-              sx={{ fontWeight: 400 }}
-              primary={comment.text}
-              secondary={
-                <>
-                  <Typography
-                    component="span"
-                    color="textPrimary"
-                    sx={{ display: 'inline', fontSize: '1em', fontWeight: 500, mr: 1 }}
-                  >
-                    {comment.author.name}
-                  </Typography>
-                  <Typography component="span" sx={{ fontSize: '0.9em' }}>
-                    {formatDistanceToNow(new Date(Number(comment.createdAt)))} ago
-                  </Typography>
-                </>
-              }
-            />
+        <ListItem
+          key={index}
+          alignItems="flex-start"
+          disableGutters
+          sx={{ px: 0, py: 1, gap: 1 }}
+        >
+          <Avatar
+            src={avatarSrc(comment.author.picture)}
+            alt={comment.author.name}
+            sx={{ width: 28, height: 28, mt: 0.25 }}
+          />
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'baseline' }}>
+              <Typography variant="body2" fontWeight={600} component="span">
+                {comment.author.name}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" component="span">
+                {formatDistanceToNow(new Date(Number(comment.createdAt)))} ago
+              </Typography>
+            </Box>
+            <Typography variant="body2" sx={{ mt: 0.25, wordBreak: 'break-word' }}>
+              {comment.text}
+            </Typography>
           </Box>
         </ListItem>
       ))}

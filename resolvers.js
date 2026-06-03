@@ -1,7 +1,20 @@
 const { GraphQLError } = require('graphql');
 const { PubSub } = require('graphql-subscriptions');
 const Pin = require('./models/Pin');
-const { signUp, signIn, toPublicUser } = require('./controllers/userController');
+const { signUp, signIn, googleSignIn, toPublicUser } = require('./controllers/userController');
+
+const formatPin = (pin) => {
+  if (!pin) return pin;
+  const doc = pin.toObject ? pin.toObject() : pin;
+  return {
+    ...doc,
+    author: toPublicUser(doc.author),
+    comments: (doc.comments || []).map((comment) => ({
+      ...comment,
+      author: toPublicUser(comment.author),
+    })),
+  };
+};
 
 const pubsub = new PubSub();
 const PIN_ADDED = 'PIN_ADDED';
@@ -24,18 +37,19 @@ module.exports = {
       const pins = await Pin.find({})
         .populate('author')
         .populate('comments.author');
-      return pins;
+      return pins.map(formatPin);
     },
   },
   Mutation: {
     signUp: (_, args) => signUp(args),
     signIn: (_, args) => signIn(args),
+    googleSignIn: (_, { idToken }) => googleSignIn({ idToken }),
     createPin: authenticated(async (root, args, ctx) => {
       const newPin = await new Pin({
         ...args.input,
         author: ctx.currentUser._id,
       }).save();
-      const pinAdded = await Pin.populate(newPin, 'author');
+      const pinAdded = formatPin(await Pin.populate(newPin, 'author'));
       pubsub.publish(PIN_ADDED, { pinAdded });
       return pinAdded;
     }),
@@ -46,13 +60,15 @@ module.exports = {
     }),
     createComment: authenticated(async (root, args, ctx) => {
       const newComment = { text: args.text, author: ctx.currentUser._id };
-      const pinUpdated = await Pin.findOneAndUpdate(
-        { _id: args.pinId },
-        { $push: { comments: newComment } },
-        { new: true },
-      )
-        .populate('author')
-        .populate('comments.author');
+      const pinUpdated = formatPin(
+        await Pin.findOneAndUpdate(
+          { _id: args.pinId },
+          { $push: { comments: newComment } },
+          { new: true },
+        )
+          .populate('author')
+          .populate('comments.author'),
+      );
       pubsub.publish(PIN_UPDATED, { pinUpdated });
       return pinUpdated;
     }),

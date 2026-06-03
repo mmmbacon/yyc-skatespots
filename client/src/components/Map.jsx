@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Map, { NavigationControl, Marker, Popup, useMap } from 'react-map-gl';
 import { styled } from '@mui/material/styles';
 import { useSubscription } from '@apollo/client';
 import { differenceInMinutes } from 'date-fns';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
-import DeleteIcon from '@mui/icons-material/DeleteTwoTone';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 
 import PinIcon from './PinIcon';
+import PinPopover from './Pin/PinPopover';
+import CommentDrawer from './Comment/CommentDrawer';
 import { useClient } from '../client';
 import { GET_PINS_QUERY } from '../graphql/queries';
 import { DELETE_PIN_MUTATION } from '../graphql/mutations';
@@ -20,9 +19,8 @@ import {
   PIN_DELETED_SUBSCRIPTION,
   PIN_ADDED_SUBSCRIPTION,
 } from '../graphql/subscriptions';
-import Blog from './Blog';
-import Context from '../context';
-import { config, pinImageSrc } from '../config';
+import { useAppStore } from '../stores/useAppStore';
+import { config, MAP_AREA_HEIGHT } from '../config';
 
 // Default center: Calgary (app is yyc-skatespots) until geolocation succeeds
 const INITIAL_VIEWPORT = {
@@ -48,6 +46,13 @@ const Root = styled('div', {
   display: 'flex',
   flexDirection: mobile ? 'column-reverse' : undefined,
 }));
+
+const MapArea = styled('div')({
+  position: 'relative',
+  width: '100vw',
+  height: MAP_AREA_HEIGHT,
+  overflow: 'hidden',
+});
 
 const MapControls = styled('div')({
   position: 'absolute',
@@ -100,8 +105,20 @@ function LocateMeButton({ onLocated }) {
 const MapView = () => {
   const mobileSize = useMediaQuery('(max-width: 650px)');
   const client = useClient();
-  const { state, dispatch } = useContext(Context);
+  const pins = useAppStore((state) => state.pins);
+  const draft = useAppStore((state) => state.draft);
+  const isAuth = useAppStore((state) => state.isAuth);
+  const currentUser = useAppStore((state) => state.currentUser);
+  const addPin = useAppStore((state) => state.addPin);
+  const updatePin = useAppStore((state) => state.updatePin);
+  const deletePin = useAppStore((state) => state.deletePin);
+  const setPins = useAppStore((state) => state.setPins);
+  const createDraft = useAppStore((state) => state.createDraft);
+  const updateDraftLocation = useAppStore((state) => state.updateDraftLocation);
+  const setCurrentPin = useAppStore((state) => state.setCurrentPin);
+  const mapRef = useRef(null);
   const [popup, setPopup] = useState(null);
+  const [commentDrawerOpen, setCommentDrawerOpen] = useState(false);
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT);
   const [userPosition, setUserPosition] = useState(null);
   const [locationAccuracy, setLocationAccuracy] = useState(null);
@@ -109,7 +126,7 @@ const MapView = () => {
   useSubscription(PIN_ADDED_SUBSCRIPTION, {
     onData: ({ data }) => {
       if (data.data?.pinAdded) {
-        dispatch({ type: 'CREATE_PIN', payload: data.data.pinAdded });
+        addPin(data.data.pinAdded);
       }
     },
   });
@@ -117,7 +134,7 @@ const MapView = () => {
   useSubscription(PIN_UPDATED_SUBSCRIPTION, {
     onData: ({ data }) => {
       if (data.data?.pinUpdated) {
-        dispatch({ type: 'CREATE_COMMENT', payload: data.data.pinUpdated });
+        updatePin(data.data.pinUpdated);
       }
     },
   });
@@ -125,7 +142,7 @@ const MapView = () => {
   useSubscription(PIN_DELETED_SUBSCRIPTION, {
     onData: ({ data }) => {
       if (data.data?.pinDeleted) {
-        dispatch({ type: 'DELETE_PIN', payload: data.data.pinDeleted });
+        deletePin(data.data.pinDeleted);
       }
     },
   });
@@ -137,16 +154,20 @@ const MapView = () => {
 
   const getPins = async () => {
     const { getPins: pins } = await client.request(GET_PINS_QUERY);
-    dispatch({ type: 'GET_PINS', payload: pins });
+    setPins(pins);
   };
 
   useEffect(() => {
     const pinExists =
-      popup && state.pins.findIndex((pin) => pin._id === popup._id) > -1;
+      popup && pins.findIndex((pin) => pin._id === popup._id) > -1;
     if (!pinExists) {
       setPopup(null);
     }
-  }, [state.pins.length, popup, state.pins]);
+  }, [pins.length, popup, pins]);
+
+  useEffect(() => {
+    setCommentDrawerOpen(false);
+  }, [popup?._id]);
 
   const applyUserPosition = ({ latitude, longitude, accuracy }) => {
     setUserPosition({ latitude, longitude });
@@ -170,15 +191,12 @@ const MapView = () => {
 
   const handleMapClick = (evt) => {
     if (evt.originalEvent.button !== 0) return;
-    if (!state.isAuth) return;
-    if (!state.draft) {
-      dispatch({ type: 'CREATE_DRAFT' });
+    if (!isAuth) return;
+    if (!draft) {
+      createDraft();
     }
     const { lng: longitude, lat: latitude } = evt.lngLat;
-    dispatch({
-      type: 'UPDATE_DRAFT_LOCATION',
-      payload: { longitude, latitude },
-    });
+    updateDraftLocation({ longitude, latitude });
   };
 
   const isNewPin = (pin) =>
@@ -186,7 +204,12 @@ const MapView = () => {
 
   const handleSelectPin = (pin) => {
     setPopup(pin);
-    dispatch({ type: 'SET_PIN', payload: pin });
+    setCurrentPin(pin);
+    mapRef.current?.flyTo({
+      center: [pin.longitude, pin.latitude],
+      zoom: Math.max(mapRef.current.getZoom(), 14),
+      duration: 1000,
+    });
   };
 
   const handleDeletePin = async (pin) => {
@@ -194,12 +217,18 @@ const MapView = () => {
     setPopup(null);
   };
 
-  const isAuthUser = () =>
-    state.currentUser && popup && state.currentUser._id === popup.author._id;
+  const activePin = popup
+    ? pins.find((p) => p._id === popup._id) ?? popup
+    : null;
+
+  const isPinOwner = (pin) =>
+    currentUser && pin && currentUser._id === pin.author._id;
 
   return (
     <Root mobile={mobileSize}>
+      <MapArea>
       <Map
+        ref={mapRef}
         mapboxAccessToken={config.mapboxToken}
         latitude={viewport.latitude}
         longitude={viewport.longitude}
@@ -207,7 +236,7 @@ const MapView = () => {
         onMove={(evt) => setViewport(evt.viewState)}
         onClick={handleMapClick}
         scrollZoom={!mobileSize}
-        style={{ width: '100vw', height: 'calc(100vh - 64px)' }}
+        style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
       >
         <MapControls>
@@ -233,17 +262,17 @@ const MapView = () => {
           </Marker>
         )}
 
-        {state.draft && (
+        {draft && (
           <Marker
-            latitude={state.draft.latitude}
-            longitude={state.draft.longitude}
+            latitude={draft.latitude}
+            longitude={draft.longitude}
             anchor="bottom"
           >
             <PinIcon size={40} color="hotpink" />
           </Marker>
         )}
 
-        {state.pins.map((pin) => (
+        {pins.map((pin) => (
           <Marker
             key={pin._id}
             latitude={pin.latitude}
@@ -253,51 +282,43 @@ const MapView = () => {
             <PinIcon
               size={40}
               title={pin.title}
-              onClick={() => handleSelectPin(pin)}
+              onClick={(event) => {
+                event.stopPropagation();
+                handleSelectPin(pin);
+              }}
               isNewPin={isNewPin(pin)}
             />
           </Marker>
         ))}
 
-        {popup && (
+        {activePin && (
           <Popup
+            className="pin-popup"
             anchor="top"
-            latitude={popup.latitude}
-            longitude={popup.longitude}
+            latitude={activePin.latitude}
+            longitude={activePin.longitude}
             closeOnClick={false}
+            maxWidth="360"
             onClose={() => setPopup(null)}
           >
-            <img
-              style={{
-                padding: '0.4em',
-                height: 200,
-                width: 200,
-                objectFit: 'cover',
-              }}
-              src={pinImageSrc(popup.image)}
-              alt={popup.title}
+            <PinPopover
+              pin={activePin}
+              showDelete={isPinOwner(activePin)}
+              onDelete={() => handleDeletePin(activePin)}
+              onOpenCommentDrawer={() => setCommentDrawerOpen(true)}
             />
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-              }}
-            >
-              <Typography>
-                {popup.latitude.toFixed(6)}, {popup.longitude.toFixed(6)}
-              </Typography>
-              {isAuthUser() && (
-                <Button onClick={() => handleDeletePin(popup)}>
-                  <DeleteIcon sx={{ color: 'red' }} />
-                </Button>
-              )}
-            </div>
           </Popup>
         )}
       </Map>
-      <Blog />
+      <CommentDrawer
+        open={commentDrawerOpen}
+        onClose={() => setCommentDrawerOpen(false)}
+        pinId={activePin?._id}
+        pinTitle={activePin?.title}
+        comments={activePin?.comments}
+        isAuth={isAuth}
+      />
+      </MapArea>
     </Root>
   );
 };

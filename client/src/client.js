@@ -1,15 +1,16 @@
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import { GraphQLClient } from 'graphql-request';
-import Context from './context';
+
 import { config } from './config';
+import { useAppStore } from './stores/useAppStore';
 
 export function useClient() {
-  const { state } = useContext(Context);
+  const idToken = useAppStore((state) => state.idToken);
   return useMemo(
     () =>
       new GraphQLClient(config.graphqlHttpUrl, {
-        headers: { authorization: state.idToken || '' },
+        headers: { authorization: idToken || '' },
       }),
-    [state.idToken],
+    [idToken],
   );
 }

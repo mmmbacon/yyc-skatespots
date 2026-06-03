@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -12,19 +12,19 @@ import {
 } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { googleLogout } from '@react-oauth/google';
-import Context from '../../context';
-import { DEFAULT_PIN_IMAGE } from '../../config';
+import { avatarSrc } from '../../config';
+import { signOutUser } from '../../utils/authSession';
+import { useAppStore } from '../../stores/useAppStore';
 
 const UserMenu = ({ mobileSize }) => {
-  const { state, dispatch } = useContext(Context);
-  const { currentUser } = state;
+  const currentUser = useAppStore((state) => state.currentUser);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
   const handleSignOut = () => {
     setAnchorEl(null);
     googleLogout();
-    dispatch({ type: 'SIGNOUT_USER' });
+    signOutUser();
   };
 
   const displayName = currentUser.username || currentUser.name;
@@ -54,7 +54,7 @@ const UserMenu = ({ mobileSize }) => {
             </Typography>
           )}
           <Avatar
-            src={currentUser.picture || DEFAULT_PIN_IMAGE}
+            src={avatarSrc(currentUser.picture)}
             alt={displayName}
             sx={{ width: 35, height: 35 }}
           />

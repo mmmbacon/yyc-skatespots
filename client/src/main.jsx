@@ -1,45 +1,41 @@
-import React, { useMemo, useReducer } from 'react';
+import React, { useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import App from './pages/App.jsx';
-import Context from './context';
-import reducer from './reducer';
+import AuthBootstrap from './components/Auth/AuthBootstrap';
 import { createApolloClient } from './apolloClient';
 import { config } from './config';
+import { useAppStore } from './stores/useAppStore';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import './mapPopup.css';
 
-const initialState = {
-  currentUser: null,
-  idToken: null,
-  isAuth: false,
-  draft: null,
-  pins: [],
-  currentPin: null,
-};
-
-function Root() {
-  const [state, dispatch] = useReducer(reducer, initialState);
+function ApolloApp({ children }) {
+  const idToken = useAppStore((state) => state.idToken);
   const apolloClient = useMemo(
-    () => createApolloClient(() => state.idToken),
-    [state.idToken],
+    () => createApolloClient(() => idToken),
+    [idToken],
   );
 
+  return <ApolloProvider client={apolloClient}>{children}</ApolloProvider>;
+}
+
+function Root() {
   return (
     <GoogleOAuthProvider clientId={config.googleClientId}>
-      <ApolloProvider client={apolloClient}>
-        <Context.Provider value={{ state, dispatch }}>
+      <ApolloApp>
+        <AuthBootstrap>
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<App />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
-        </Context.Provider>
-      </ApolloProvider>
+        </AuthBootstrap>
+      </ApolloApp>
     </GoogleOAuthProvider>
   );
 }

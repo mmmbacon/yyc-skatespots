@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import {
   TextField,
@@ -12,7 +12,7 @@ import AddAPhotoIcon from '@mui/icons-material/AddAPhotoTwoTone';
 import ClearIcon from '@mui/icons-material/Clear';
 import SaveIcon from '@mui/icons-material/SaveTwoTone';
 
-import Context from '../../context';
+import { useAppStore } from '../../stores/useAppStore';
 import { CREATE_PIN_MUTATION } from '../../graphql/mutations';
 import { useClient } from '../../client';
 import { config, DEFAULT_PIN_IMAGE } from '../../config';
@@ -32,7 +32,8 @@ const HiddenInput = styled('input')({
 const CreatePin = () => {
   const mobileSize = useMediaQuery('(max-width:650px)');
   const client = useClient();
-  const { state, dispatch } = useContext(Context);
+  const draft = useAppStore((state) => state.draft);
+  const deleteDraft = useAppStore((state) => state.deleteDraft);
   const [title, setTitle] = useState('');
   const [image, setImage] = useState(null);
   const [content, setContent] = useState('');
@@ -42,7 +43,7 @@ const CreatePin = () => {
     setTitle('');
     setImage(null);
     setContent('');
-    dispatch({ type: 'DELETE_DRAFT' });
+    deleteDraft();
   };
 
   const handleSubmit = async (event) => {
@@ -50,7 +51,7 @@ const CreatePin = () => {
       event.preventDefault();
       setSubmitting(true);
       const url = image ? await handleImageUpload() : config.defaultPinImage;
-      const { latitude, longitude } = state.draft;
+      const { latitude, longitude } = draft;
       await client.request(CREATE_PIN_MUTATION, {
         title,
         image: url,
