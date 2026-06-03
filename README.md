@@ -4,7 +4,7 @@ A Node.js + React SPA for sharing skate spots on a map. GraphQL API (Apollo Serv
 
 ## Prerequisites
 
-- Node.js 18+ (20 LTS recommended)
+- Node.js 24.x (Vercel) or 20+ locally
 - Docker (for local MongoDB)
 - Google OAuth Web client ID
 - Mapbox access token

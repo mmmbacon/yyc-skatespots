@@ -4,7 +4,7 @@
   "description": "Skate spot map — GraphQL API",
   "main": "server.js",
   "engines": {
-    "node": ">=18"
+    "node": "24.x"
   },
   "scripts": {
     "start": "node server.js",
