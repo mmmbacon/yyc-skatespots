@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -16,14 +16,12 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { GraphQLClient } from 'graphql-request';
-import Context from '../../context';
 import { config } from '../../config';
 import { SIGN_IN_MUTATION, SIGN_UP_MUTATION } from '../../graphql/mutations';
 import { applyAuthSession } from '../../utils/authSession';
 import GoogleSignInButton from './GoogleSignInButton';
 
 const AuthDialog = ({ open, onClose }) => {
-  const { dispatch } = useContext(Context);
   const [tab, setTab] = useState(0);
   const [mode, setMode] = useState('signIn');
   const [login, setLogin] = useState('');
@@ -64,13 +62,13 @@ const AuthDialog = ({ open, onClose }) => {
           email,
           password,
         });
-        applyAuthSession(dispatch, signUp);
+        applyAuthSession(signUp);
       } else {
         const { signIn } = await client.request(SIGN_IN_MUTATION, {
           login,
           password,
         });
-        applyAuthSession(dispatch, signIn);
+        applyAuthSession(signIn);
       }
       handleClose();
     } catch (err) {

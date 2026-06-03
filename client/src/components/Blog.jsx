@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Paper, useMediaQuery } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Context from '../context';
+import { useAppStore } from '../stores/useAppStore';
 import NoContent from './Pin/NoContent';
 import CreatePin from './Pin/CreatePin';
 import PinContent from './Pin/PinContent';
@@ -20,8 +20,8 @@ const StyledPaper = styled(Paper, {
 
 const Blog = () => {
   const mobileSize = useMediaQuery('(max-width:650px)');
-  const { state } = useContext(Context);
-  const { draft, currentPin } = state;
+  const draft = useAppStore((state) => state.draft);
+  const currentPin = useAppStore((state) => state.currentPin);
 
   let BlogContent = NoContent;
   if (draft && !currentPin) BlogContent = CreatePin;

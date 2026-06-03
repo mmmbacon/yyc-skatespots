@@ -48,6 +48,7 @@ type Query {
 type Mutation {
   signUp(username: String!, email: String!, password: String!): AuthPayload!
   signIn(login: String!, password: String!): AuthPayload!
+  googleSignIn(idToken: String!): AuthPayload!
   createPin(input: CreatePinInput!): Pin
   deletePin(pinId: ID!): Pin
   createComment(pinId: ID!, text: String!): Pin

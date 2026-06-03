@@ -1,23 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@mui/material';
-import AuthDialog from './AuthDialog';
+
+import { useAppStore } from '../../stores/useAppStore';
 
 const HeaderAuth = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const openAuthDialog = useAppStore((state) => state.openAuthDialog);
 
   return (
-    <>
-      <Button
-        variant="outlined"
-        color="inherit"
-        size="small"
-        onClick={() => setDialogOpen(true)}
-        sx={{ borderColor: 'rgba(255,255,255,0.5)' }}
-      >
-        Sign in
-      </Button>
-      <AuthDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
-    </>
+    <Button
+      variant="outlined"
+      color="inherit"
+      size="small"
+      onClick={openAuthDialog}
+      sx={{ borderColor: 'rgba(255,255,255,0.5)' }}
+    >
+      Sign in
+    </Button>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import {
   AppBar,
   Toolbar,
@@ -7,7 +7,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Context from '../context';
+import { useAppStore } from '../stores/useAppStore';
 import UserMenu from './Auth/UserMenu';
 import HeaderAuth from './Auth/HeaderAuth';
 
@@ -17,8 +17,8 @@ const Logo = styled('img')({
 
 const Header = () => {
   const mobileSize = useMediaQuery('(max-width:650px)');
-  const { state } = useContext(Context);
-  const { currentUser, isAuth } = state;
+  const currentUser = useAppStore((state) => state.currentUser);
+  const isAuth = useAppStore((state) => state.isAuth);
 
   return (
     <AppBar position="static">
