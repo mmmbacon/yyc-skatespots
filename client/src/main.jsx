@@ -31,6 +31,7 @@ function Root() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<App />} />
+              <Route path="/login" element={<Navigate to="/" replace />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
