@@ -28,6 +28,25 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script>
+      (function () {
+        var path = location.pathname;
+        if (path === '/login' || path === '/login/') {
+          location.replace(
+            location.origin + '/' + location.search + location.hash,
+          );
+          return;
+        }
+        window.addEventListener('pageshow', function (event) {
+          if (
+            event.persisted &&
+            (location.pathname === '/login' || location.pathname === '/login/')
+          ) {
+            location.reload();
+          }
+        });
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
